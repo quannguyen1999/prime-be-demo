@@ -1,0 +1,24 @@
+spring:
+  # Mysql
+  datasource:
+    port: 3306
+    schema: prime_dev
+    hikari:
+      connectionTimeout: 20000
+      maximum-pool-size: 5
+    url: jdbc:mysql://localhost:${spring.datasource.port}/${spring.datasource.schema}
+    username: mysql
+    password: mysql
+  # Flyway
+  flyway:
+    url: jdbc:mysql://localhost:${spring.datasource.port}/
+    schemas: ${spring.datasource.schema}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    enabled: true
+    validate-migration-naming: true
+info:
+  app:
+    name: "Prime Project"
+    description: "Prime be project prod"
+    version: "1.0.0"

@@ -1,0 +1,15 @@
+server:
+  port: 8070
+spring:
+  application:
+    name: prime-project
+  profiles:
+    active: dev
+
+#Spring doc
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  api-docs:
+    version: OPENAPI_3_0

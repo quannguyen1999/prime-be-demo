@@ -1,0 +1,31 @@
+package com.prime.constants;
+
+public enum MessageErrors {
+    //Common
+    PAGE_INVALID,
+    SIZE_INVALID,
+    //UnAuthorized
+    USER_UNAUTHORIZED,
+    ACCOUNT_USERNAME_OR_PASS_INVALID,
+
+    //Product
+    PRODUCT_INVALID,
+    PRODUCT_ID_NOT_FOUND,
+
+    PRODUCT_NAME_INVALID,
+    PRODUCT_DESCRIPTION_INVALID,
+
+    //User
+    USER_INVALID,
+    USER_NAME_INVALID,
+    USER_NAME_EXISTS,
+    USER_PASSWORD_INVALID,
+
+    //Task
+    TASK_INVALID,
+    TASK_NOT_EXISTS,
+    TASK_TITLE_INVALID,
+    TASK_DESCRIPTION_INVALID,
+    TASK_USER_NAME_INVALID
+
+}
