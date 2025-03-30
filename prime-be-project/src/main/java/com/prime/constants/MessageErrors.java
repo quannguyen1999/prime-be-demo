@@ -1,5 +1,8 @@
 package com.prime.constants;
 
+/**
+ * Define Error message
+ */
 public enum MessageErrors {
     //Common
     PAGE_INVALID,

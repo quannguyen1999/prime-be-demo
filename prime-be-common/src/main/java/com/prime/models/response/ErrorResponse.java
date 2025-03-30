@@ -5,12 +5,20 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Represents a standardized error response returned by the API.
+ */
 @Data
 @AllArgsConstructor
 public class ErrorResponse {
 
-    public String message;
+    /**
+     * A brief message describing the error.
+     */
+    private String message;
 
-    public List<String> details;
-
+    /**
+     * A list containing detailed error descriptions.
+     */
+    private List<String> details;
 }

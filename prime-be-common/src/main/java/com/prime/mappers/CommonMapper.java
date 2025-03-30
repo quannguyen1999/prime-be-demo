@@ -10,13 +10,7 @@ public interface CommonMapper {
     String CONVERT_TO_STRING = "convertToString";
     String CONVERT_TO_UUID = "convertToUUID";
     String CONVERT_TO_BOOLEAN = "convertToBoolean";
-
     String CONVERT_TO_DOUBLE = "convertToDouble";
-
-    //Format Date
-    String DATE_FORMAT = "yyyy-MM-dd";
-
-    String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @Named(CONVERT_TO_STRING)
     default String convertToString(Object fieldValue) {

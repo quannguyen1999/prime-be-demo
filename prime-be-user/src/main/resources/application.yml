@@ -1,15 +1,18 @@
+# Server Configuration
 server:
-  port: 8070
-spring:
-  application:
-    name: prime-project
-  profiles:
-    active: dev
+  port: 8070  # The application will run on port 8070
 
-#Spring doc
+# Spring Framework Configuration
+spring:
+  profiles:
+    active: dev  # Sets the active profile to 'dev' (development environment)
+  application:
+    name: prime-user-service  # Name of the Spring Boot application
+
+# API Documentation (Swagger & OpenAPI)
 springdoc:
   swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
+    enabled: true  # Enables Swagger UI for API documentation
+    path: /swagger-ui.html  # Access Swagger UI at this URL
   api-docs:
-    version: OPENAPI_3_0
+    version: OPENAPI_3_0  # Defines OpenAPI specification version (3.0)

@@ -7,7 +7,6 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.prime.config.grantpassword.CustomPassordAuthenticationConverter;
 import com.prime.config.grantpassword.CustomPassordAuthenticationProvider;
-import com.prime.constants.PathApi;
 import com.prime.models.request.CustomPasswordUser;
 import com.prime.repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
@@ -44,9 +42,7 @@ import org.springframework.security.oauth2.server.authorization.settings.OAuth2T
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.ObjectUtils;
@@ -62,30 +58,36 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.prime.constants.PathApi.AUTHORIZE_PATH;
-import static com.prime.constants.PathApi.USER;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SecurityConfig {
 
+    //  Allowed endpoints for public access (Swagger, OAuth2, Registration, etc.)
     private static final List<String> ALLOW_REQUEST = Arrays.asList(
             "/v3/api-docs/**",  // OpenAPI docs
             "/swagger-ui/**",   // Swagger UI
             "/swagger-ui.html", // Swagger UI main page
             "/webjars/**",      // WebJars for Swagger
-            USER
+            "/oauth2/token",    // OAuth2 Token Generation
+            "/registration",    // User Registration Endpoint
+            "/authenticator",   // Custom Authentication
+            "/user"             // User Endpoint
     );
 
-    @Value("${custom-security.issuer}")
+    @Value("${custom-security.issuer}")  // OAuth2 Issuer URL (Defined in application.yml)
     private String issuer;
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Security Filter Chain for OAuth2 Authorization Server
+     * - Handles token generation, authentication, and authorization
+     */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityFilterChain asSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -109,13 +111,9 @@ public class SecurityConfig {
                         .accessTokenRequestConverter(new CustomPassordAuthenticationConverter())
                         .authenticationProvider(new CustomPassordAuthenticationProvider(authorizationService(),
                                 tokenGenerator(), userRepository, passwordEncoder(), tokenCustomizer()))
-                        .accessTokenRequestConverters(getConverters())
-                        .authenticationProviders(getProviders()))
+                )
                 .oidc(withDefaults())
                 .and()
-                .exceptionHandling(e -> e.authenticationEntryPoint(new
-                        LoginUrlAuthenticationEntryPoint(PathApi.LOGIN_PATH))
-                )
                 .oauth2ResourceServer((resourceServer) -> resourceServer.jwt(withDefaults()))
                 .build();
     }
@@ -134,14 +132,6 @@ public class SecurityConfig {
         OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
         return new DelegatingOAuth2TokenGenerator(
                 jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
-    }
-
-    private Consumer<List<AuthenticationConverter>> getConverters() {
-        return a -> a.forEach(System.out::println);
-    }
-
-    private Consumer<List<AuthenticationProvider>> getProviders() {
-        return a -> a.forEach(System.out::println);
     }
 
     @Bean
@@ -209,7 +199,6 @@ public class SecurityConfig {
 
             context.getClaims().claim("authorities", authorities)
                     .claim("user", username);
-
         };
     }
 

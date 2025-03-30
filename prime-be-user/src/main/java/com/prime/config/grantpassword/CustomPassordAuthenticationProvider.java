@@ -70,6 +70,7 @@ public class CustomPassordAuthenticationProvider implements AuthenticationProvid
         if (clientPrincipal != null && clientPrincipal.isAuthenticated()) {
             return clientPrincipal;
         }
+        Object reslt = authentication.getPrincipal();
         throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
     }
 

@@ -12,37 +12,64 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller for managing tasks.
+ * Provides endpoints for creating, retrieving, updating, and deleting tasks.
+ */
 @RestController
 @RequestMapping(value = PathApi.TASK)
 @AllArgsConstructor
 public class TaskController {
+
     private final TaskService taskService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    /**
+     * Creates a new task.
+     *
+     * @param taskRequest The request body containing task details.
+     * @return ResponseEntity with created task details and HTTP 201 status.
+     */
+    @PostMapping
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskRequest));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(taskService.createTask(taskRequest));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    /**
+     * Retrieves a paginated list of tasks.
+     *
+     * @param page The page number (zero-based index).
+     * @param size The number of tasks per page.
+     * @return ResponseEntity with a list of tasks and HTTP 200 status.
+     */
+    @GetMapping
     public ResponseEntity<List<TaskResponse>> getListTask(@RequestParam Integer page, @RequestParam Integer size) {
-        return ResponseEntity.status(HttpStatus.OK).body(taskService.listTask(page, size));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.listTask(page, size));
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<TaskResponse> putTask(@RequestBody TaskRequest taskRequest, @RequestParam UUID taskId) {
-        return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(taskRequest, taskId));
+    /**
+     * Updates an existing task.
+     *
+     * @param taskRequest The request body with updated task details.
+     * @param taskId      The UUID of the task to be updated.
+     * @return ResponseEntity with updated task details and HTTP 200 status.
+     */
+    @PutMapping
+    public ResponseEntity<TaskResponse> updateTask(@RequestBody TaskRequest taskRequest, @RequestParam UUID taskId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.updateTask(taskRequest, taskId));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    /**
+     * Deletes a task by its ID.
+     *
+     * @param taskId The UUID of the task to be deleted.
+     * @return ResponseEntity with a success message and HTTP 200 status.
+     */
+    @DeleteMapping
     public ResponseEntity<String> deleteTask(@RequestParam UUID taskId) {
         taskService.deleteTask(taskId);
-        return ResponseEntity.status(HttpStatus.OK).body(HttpStatus.OK.toString());
+        return ResponseEntity.ok("Task deleted successfully.");
     }
-
-
-
-
-
-
-
 }

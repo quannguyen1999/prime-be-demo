@@ -1,0 +1,26 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Exposes all available Spring Boot Actuator endpoints
+  health:
+    readiness-state:
+      enabled: true  # Enables readiness probes (useful for Kubernetes)
+    liveness-state:
+      enabled: true  # Enables liveness probes (useful for Kubernetes)
+  endpoint:
+    health:
+      probes:
+        enabled: true  # Ensures health probes are enabled
+  metrics:
+    tags:
+      application: ${spring.application.name}  # Adds application name as a tag for metrics
+
+# Logging Configuration
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+    # Custom logging format including:
+    # - Log level (e.g., INFO, ERROR)
+    # - Application name
+    # - Distributed tracing IDs (trace_id, span_id) for better tracking

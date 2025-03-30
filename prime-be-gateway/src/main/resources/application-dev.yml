@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false  # Disables automatic service discovery for routes (manual routing is used in GatewayApplication)
+          lowerCaseServiceId: true  # Converts service IDs to lowercase for consistency
+      httpclient:
+        connect-timeout: 1000  # Sets HTTP client connection timeout to 1000ms (1 second)
+        response-timeout: 2s  # Sets the maximum response wait time to 2 seconds
+
+# Eureka Client Configuration
+eureka:
+  preferIdAddress: true  # Prefers using instance IP address instead of hostname when communicating with Eureka
+  client:
+    fetchRegistry: true  # Enables fetching service registry information from Eureka
+    registerWithEureka: true  # Registers this service with Eureka
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/  # URL of the Eureka server for service registration & discovery

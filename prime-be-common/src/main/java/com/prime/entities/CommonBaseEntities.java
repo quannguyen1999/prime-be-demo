@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * Description: Common fields for all entities
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

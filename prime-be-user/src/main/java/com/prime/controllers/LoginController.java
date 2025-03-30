@@ -9,9 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -28,8 +26,6 @@ import static com.prime.constants.PathApi.REGISTRATION_PATH;
 @Controller
 public class LoginController {
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
-    private final AuthenticationFailureHandler authenticatorFailureHandler =
-            new SimpleUrlAuthenticationFailureHandler("/authenticator?error");
 
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
@@ -46,8 +42,7 @@ public class LoginController {
     }
 
     @GetMapping(AUTHENTICATOR_PATH)
-    public String authenticator(
-            @CurrentSecurityContext SecurityContext context) {
+    public String authenticator(@CurrentSecurityContext SecurityContext context) {
         return "authenticator";
     }
 
@@ -57,10 +52,8 @@ public class LoginController {
             HttpServletRequest request,
             HttpServletResponse response,
             @CurrentSecurityContext SecurityContext context) throws ServletException, IOException {
-
-
             this.authenticationSuccessHandler.onAuthenticationSuccess(request, response, getAuthentication(request, response));
-               }
+    }
 
     private Authentication getAuthentication(
             HttpServletRequest request,

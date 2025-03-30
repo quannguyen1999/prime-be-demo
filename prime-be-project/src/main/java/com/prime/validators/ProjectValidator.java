@@ -32,8 +32,7 @@ public class ProjectValidator extends CommonValidator{
         validateUUID(projectUUID);
         validateCreate(projectRequest);
     }
-
-
+    
     private void validateUUID(UUID projectUuid) {
         checkCondition().accept(ObjectUtils.isEmpty(projectRepository.findById(projectUuid)), PRODUCT_ID_NOT_FOUND);
     }

@@ -14,7 +14,6 @@ public class UserValidator extends  CommonValidator{
 
     private static final Integer NAME_SIZE = 5;
 
-
     private final UserRepository userRepository;
 
     public void validateCreate(UserRequest userRequest) {
