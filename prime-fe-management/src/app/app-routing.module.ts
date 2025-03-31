@@ -7,8 +7,9 @@ import { UserListComponent } from './components/users/user-list/user-list.compon
 import { ProjectListComponent } from './components/project/project-list/project-list.component';
 import { TaskListComponent } from './components/tasks/task-list/task-list.component';
 import { PageNotFoundComponent } from './components/errors/page-not-found/page-not-found.component';
+import { ProjectDetailsComponent } from './components/project/project-detail/project-detail.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'home',
     component: DashboardComponent
@@ -26,8 +27,12 @@ const routes: Routes = [
     component: UserListComponent
   },
   {
-    path: 'projects',
+    path: 'project',
     component: ProjectListComponent
+  },
+  {
+    path: 'project/:id',
+    component: ProjectDetailsComponent
   },
   {
     path: 'tasks',

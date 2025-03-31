@@ -10,17 +10,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
-  declarations: [AddUserDialogComponent],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatSelectModule,
-    MatFormFieldModule
-  ],
-  exports: [AddUserDialogComponent]
+  imports: [AddUserDialogComponent]
 })
 export class AddUserDialogModule { } 

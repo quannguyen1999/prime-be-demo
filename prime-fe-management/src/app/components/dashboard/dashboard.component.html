@@ -3,13 +3,13 @@
    
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
     <!-- Charts Section -->
-    <div class="grid grid-cols-3 gap-4 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
        
         <!-- Line Chart -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="bg-white rounded-xl shadow-sm p-6 overflow-hidden">
             <h2 class="text-lg font-semibold text-gray-900 mb-6">Project Progress Trend</h2>
             <ngx-charts-line-chart
-                [view]="[350, 300]"
+                [view]="[400, 300]"
                 [scheme]="colorScheme"
                 [results]="progressData"
                 [gradient]="true"
@@ -26,10 +26,10 @@
         </div>
 
         <!-- Pie Chart -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="bg-white rounded-xl shadow-sm p-6 overflow-hidden">
             <h2 class="text-lg font-semibold text-gray-900 mb-6">Projects by Type</h2>
             <ngx-charts-advanced-pie-chart
-                [view]="[350, 300]"
+                [view]="[400, 300]"
                 [scheme]="colorScheme"
                 [results]="projectTypeData"
                 [gradient]="false">
@@ -114,18 +114,19 @@
     </div>
 </div>
     <!-- Projects Grid/List -->
-    <div [class]="viewType === 'grid' ? 'grid grid-cols-3 gap-6' : 'space-y-4'">
+    <div [class]="viewType === 'grid' ? 'grid grid-cols-2 gap-6' : 'space-y-4'" class="md:grid-cols-2 lg:grid-cols-3">
         <div *ngFor="let project of projects" 
-             class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200"
+             class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
              [class.p-6]="viewType === 'grid'"
-             [class.p-4]="viewType === 'list'">
+             [class.p-4]="viewType === 'list'"
+             (click)="navigateToProject(project.id)">
             <!-- Project Header -->
             <div class="flex justify-between items-start mb-6">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-1">{{project.title}}</h3>
                     <p class="text-gray-500 text-sm">{{project.type}}</p>
                 </div>
-                <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400 hover:text-gray-600">
+                <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400 hover:text-gray-600" (click)="$event.stopPropagation()">
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu" class="rounded-lg">

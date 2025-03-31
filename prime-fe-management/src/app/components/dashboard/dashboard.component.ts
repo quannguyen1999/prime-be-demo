@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { curveLinear } from 'd3-shape';
+import { Router } from '@angular/router';
+import { SharedModule } from '../../shared/shared.module';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 interface ProjectCard {
   id: string;
@@ -23,7 +26,11 @@ interface ActivityLog {
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  standalone: true,
+  imports: [
+    SharedModule,
+    NgxChartsModule
+  ]
 })
 export class DashboardComponent implements OnInit {
   currentDate = new Date();
@@ -199,7 +206,7 @@ export class DashboardComponent implements OnInit {
     }
   ];
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {}
 
@@ -226,5 +233,9 @@ export class DashboardComponent implements OnInit {
       case 'Deleted': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  }
+
+  navigateToProject(projectId: string) {
+    this.router.navigate(['/projects', projectId]);
   }
 }

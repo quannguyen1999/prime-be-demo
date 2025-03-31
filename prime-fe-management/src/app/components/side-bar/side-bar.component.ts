@@ -5,6 +5,8 @@ import { Menu } from 'src/app/models/menu.model';
 import { SidebarService } from '../../services/sidebar.service';
 import { EventEmitter, Input, Output } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-side-bar',
@@ -35,6 +37,11 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
         animate('0.2s ease-in-out')
       ])
     ])
+  ],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatIconModule
   ]
 })
 export class SideBarComponent implements OnInit {

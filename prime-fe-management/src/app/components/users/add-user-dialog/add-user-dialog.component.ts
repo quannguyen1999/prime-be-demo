@@ -1,18 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-
-interface UserForm {
-  username: string;
-  email: string;
-  role: string;
-  status: 'Active' | 'Inactive';
-}
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-add-user-dialog',
   templateUrl: './add-user-dialog.component.html',
-  styleUrls: ['./add-user-dialog.component.scss']
+  standalone: true,
+  imports: [SharedModule]
 })
 export class AddUserDialogComponent implements OnInit {
   userForm: FormGroup;
@@ -25,7 +20,7 @@ export class AddUserDialogComponent implements OnInit {
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       role: ['User', Validators.required],
-      status: ['Active']
+      status: ['Active', Validators.required]
     });
   }
 
@@ -33,16 +28,11 @@ export class AddUserDialogComponent implements OnInit {
 
   onSubmit(): void {
     if (this.userForm.valid) {
-      const formValue = this.userForm.value;
-      const newUser = {
-        ...formValue,
-        createdOn: new Date()
-      };
-      this.dialogRef.close(newUser);
+      this.dialogRef.close(this.userForm.value);
     }
   }
 
-  onClose(): void {
+  onCancel(): void {
     this.dialogRef.close();
   }
 } 

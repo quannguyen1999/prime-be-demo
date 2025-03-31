@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddUserDialogComponent } from '../add-user-dialog/add-user-dialog.component';
+import { SharedModule } from '../../../shared/shared.module';
 
 interface User {
   id: string;
@@ -19,7 +20,8 @@ interface User {
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [SharedModule]
 })
 export class UserListComponent implements OnInit {
   displayedColumns: string[] = ['username', 'email', 'role', 'status', 'createdOn', 'lastSeen', 'actions'];

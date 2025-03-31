@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-add-task-dialog',
@@ -15,7 +17,13 @@ import { MatDialogRef } from '@angular/material/dialog';
     .form-field input::placeholder, .form-field textarea::placeholder {
       color: #64748b;
     }
-  `]
+  `],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SharedModule
+  ]
 })
 export class AddTaskDialogComponent implements OnInit {
   taskForm: FormGroup;

@@ -17,7 +17,7 @@ export const listMenus: Array<Menu> = [ {
         typeIcon: 'developer_board',
         value: 'Manage Projects',
         isSelected: false,
-        url: 'projects'
+        url: 'project'
     },
     {
         id: 3,

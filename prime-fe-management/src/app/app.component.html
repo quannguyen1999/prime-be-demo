@@ -1,5 +1,7 @@
-<app-header></app-header>
-<app-side-bar></app-side-bar>
-<div class="flex-1 p-6 mt-16" [ngStyle]="{'margin-left': isExpandedSidebar ? '230px' : '45px'}">
-    <router-outlet></router-outlet>
+<ng-container *ngIf="!isLoginPage">
+  <app-header></app-header>
+  <app-side-bar></app-side-bar>
+</ng-container>
+<div class="flex-1" [ngClass]="{'p-6 mt-16': !isLoginPage}" [ngStyle]="!isLoginPage ? {'margin-left': isExpandedSidebar ? '230px' : '45px'} : {}">
+  <router-outlet></router-outlet>
 </div>

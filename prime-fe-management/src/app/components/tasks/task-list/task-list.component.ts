@@ -2,6 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SharedModule } from '../../../shared/shared.module';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddTaskDialogComponent } from '../add-task-dialog/add-task-dialog.component';
 
@@ -21,7 +24,14 @@ interface Task {
 @Component({
   selector: 'app-task-list',
   templateUrl: './task-list.component.html',
-  styleUrls: ['./task-list.component.scss']
+  styleUrls: ['./task-list.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    SharedModule,
+    AddTaskDialogComponent
+  ]
 })
 export class TaskListComponent implements OnInit {
   displayedColumns: string[] = ['title', 'projectName', 'description', 'status', 'assignedToName', 'actions'];

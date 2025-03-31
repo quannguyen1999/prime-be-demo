@@ -4,6 +4,15 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddProjectDialogComponent } from '../add-project-dialog/add-project-dialog.component';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
 
 interface Project {
   id: string;
@@ -18,7 +27,18 @@ interface Project {
 @Component({
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
-  styleUrls: ['./project-list.component.scss']
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatDialogModule,
+    FormsModule
+  ]
 })
 export class ProjectListComponent implements OnInit {
   displayedColumns: string[] = ['name', 'description', 'createdAt', 'updatedAt', 'username', 'actions'];

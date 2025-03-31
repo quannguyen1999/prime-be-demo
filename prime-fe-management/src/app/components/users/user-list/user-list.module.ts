@@ -11,26 +11,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
+import { TimeAgoPipe } from '../../../shared/pipes/time-ago.pipe';
 import { AddUserDialogModule } from '../add-user-dialog/add-user-dialog.module';
 
 @NgModule({
-  declarations: [UserListComponent, TimeAgoPipe],
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatSelectModule,
+    UserListComponent,
+    TimeAgoPipe,
     AddUserDialogModule
-  ],
-  exports: [UserListComponent]
+  ]
 })
 export class UserListModule { } 
