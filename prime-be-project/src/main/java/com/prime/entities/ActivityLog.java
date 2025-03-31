@@ -31,4 +31,6 @@ public class ActivityLog {
     private ActivityAction action;
 
     private LocalTime timestamp;
+    
+
 }

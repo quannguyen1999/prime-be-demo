@@ -3,6 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { UserListModule } from './components/users/user-list/user-list.module';
+import { ProjectModule } from './components/project/project.module';
+import { TaskModule } from './components/tasks/task.module';
+import { DashboardModule } from './components/dashboard/dashboard.module';
 
 // PrimeNG Modules
 import { ButtonModule } from 'primeng/button';
@@ -18,10 +22,27 @@ import { MatCardModule } from '@angular/material/card';
 import { LoginComponent } from './components/login/login.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { SideBarComponent } from './components/side-bar/side-bar.component';
+import { RegisterComponent } from './components/register/register.component';
+import { ProjectDetailComponent } from './components/project/project-detail/project-detail.component';
+import { UserDetailComponent } from './components/users/user-detail/user-detail.component';
+import { TaskDetailComponent } from './components/tasks/task-detail/task-detail.component';
+import { ActivityLogListComponent } from './components/activityLogs/activity-log-list/activity-log-list.component';
+import { ActivityLogDetailComponent } from './components/activityLogs/activity-log-detail/activity-log-detail.component';
+import { PageNotFoundComponent } from './components/errors/page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SideBarComponent,
+    RegisterComponent,
+    ProjectDetailComponent,
+    UserDetailComponent,
+    TaskDetailComponent,
+    ActivityLogListComponent,
+    ActivityLogDetailComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -38,9 +59,15 @@ import { MatIconModule } from '@angular/material/icon';
     MatTableModule,
     MatCardModule,
     MatIconModule,
+    MatMenuModule,
     // Standalone Components
     LoginComponent,
-    HeaderComponent
+    HeaderComponent,
+    // Feature Modules
+    UserListModule,
+    ProjectModule,
+    TaskModule,
+    DashboardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

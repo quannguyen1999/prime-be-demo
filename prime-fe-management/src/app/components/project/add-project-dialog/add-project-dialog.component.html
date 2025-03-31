@@ -1,0 +1,36 @@
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold">Add New Project</h2>
+        <button mat-icon-button (click)="onClose()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+        <!-- Name -->
+        <mat-form-field appearance="outline" class="w-full mb-4">
+            <input matInput formControlName="name" placeholder="Project Name *">
+            <mat-error *ngIf="projectForm.get('name')?.hasError('required')">
+                Project name is required
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="w-full mb-4">
+            <textarea matInput 
+                      formControlName="description" 
+                      placeholder="Project Description *"
+                      rows="4"></textarea>
+            <mat-error *ngIf="projectForm.get('description')?.hasError('required')">
+                Project description is required
+            </mat-error>
+        </mat-form-field>
+
+        <div class="flex justify-end mt-6">
+            <button mat-button type="button" (click)="onClose()" class="mr-2">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="projectForm.invalid">
+                Create Project
+            </button>
+        </div>
+    </form>
+</div> 

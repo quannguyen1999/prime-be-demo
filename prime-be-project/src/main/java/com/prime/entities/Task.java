@@ -32,4 +32,6 @@ public class Task extends CommonBaseEntities{
     private TaskStatus status;
 
     private UUID assignedTo;
+   
+
 }
