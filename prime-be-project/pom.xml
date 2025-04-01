@@ -6,6 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.4.4</version>
+        <relativePath/> <!-- Remove relative path to avoid incorrect parent reference -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>prime-be-project</artifactId>

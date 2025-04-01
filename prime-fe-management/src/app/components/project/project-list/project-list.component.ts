@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SidebarService } from '../../../services/sidebar.service';
+import { ProjectService, Project } from '../../../services/project.service';
 import { AddProjectDialogComponent } from '../add-project-dialog/add-project-dialog.component';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -14,17 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-  username: string;
-  status: 'In Progress' | 'Completed' | 'On Hold';
-}
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-project-list',
@@ -39,66 +31,67 @@ interface Project {
     MatButtonModule,
     MatMenuModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    MatFormFieldModule,
+    MatSelectModule
   ]
 })
 export class ProjectListComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'description', 'status', 'createdAt', 'updatedAt', 'username', 'actions'];
-  dataSource: MatTableDataSource<Project>;
+  displayedColumns: string[] = ['name', 'description', 'status', 'created', 'updated', 'owner', 'actions'];
+  dataSource: MatTableDataSource<Project> = new MatTableDataSource<Project>([]);
   searchTerm: string = '';
   isExpandedSidebar = false;
+  totalElements = 0;
+  pageSize = 5;
+  pageIndex = 0;
+  protected readonly Math = Math;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private dialog: MatDialog,
     private router: Router,
-    private sidebarService: SidebarService
-  ) {
-    // Sample data - replace with actual API call
-    const projects: Project[] = [
-      {
-        id: 'p1e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        name: 'E-commerce Platform',
-        description: 'Online shopping platform with modern features',
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-03-15'),
-        userId: 'c3e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        username: 'John Doe',
-        status: 'In Progress'
-      },
-      {
-        id: 'p2d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        name: 'CRM System',
-        description: 'Customer relationship management system',
-        createdAt: new Date('2024-02-15'),
-        updatedAt: new Date('2024-03-14'),
-        userId: 'b4d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        username: 'Jane Smith',
-        status: 'Completed'
-      }
-    ];
-    this.dataSource = new MatTableDataSource(projects);
-  }
+    private sidebarService: SidebarService,
+    private projectService: ProjectService
+  ) {}
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.loadProjects();
     this.sidebarService.isExpanded$.subscribe(
       isExpanded => this.isExpandedSidebar = isExpanded
     );
+  }
 
-    // Add custom filter predicate for search
-    this.dataSource.filterPredicate = (data: Project, filter: string) => {
-      const searchStr = filter.toLowerCase();
-      return data.name.toLowerCase().includes(searchStr) ||
-             data.description.toLowerCase().includes(searchStr) ||
-             data.username.toLowerCase().includes(searchStr) ||
-             data.status.toLowerCase().includes(searchStr);
-    };
+  loadProjects(): void {
+    this.projectService.getProjects(this.pageIndex, this.pageSize)
+      .subscribe({
+        next: (response) => {
+          this.dataSource.data = response.content;
+          this.totalElements = response.totalElements;
+          this.pageSize = response.size;
+          this.pageIndex = response.number;
+        },
+        error: (error) => {
+          console.error('Error loading projects:', error);
+        }
+      });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadProjects();
+  }
+
+  onPageSizeChange(event: any): void {
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.loadProjects();
   }
 
   onSearch(): void {
-    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
+    this.pageIndex = 0;
+    this.loadProjects();
   }
 
   openAddProjectDialog(): void {
@@ -110,24 +103,7 @@ export class ProjectListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Generate a random UUID for the new project
-        const newProject: Project = {
-          id: crypto.randomUUID(),
-          name: result.name,
-          description: result.description,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          userId: 'c3e1a5a0-5398-4697-bbe6-00c90da7d8b5', // This should come from auth service
-          username: 'John Doe', // This should come from auth service
-          status: 'In Progress'
-        };
-        
-        // Add the new project to the table
-        const currentData = this.dataSource.data;
-        this.dataSource.data = [newProject, ...currentData];
-        
-        // TODO: Add API call to create project
-        console.log('New project added:', newProject);
+        this.loadProjects();
       }
     });
   }
@@ -137,12 +113,10 @@ export class ProjectListComponent implements OnInit {
   }
 
   editProject(project: Project): void {
-    // TODO: Implement edit logic
     console.log('Editing project:', project);
   }
 
   deleteProject(project: Project): void {
-    // TODO: Implement delete logic
     console.log('Deleting project:', project);
   }
 

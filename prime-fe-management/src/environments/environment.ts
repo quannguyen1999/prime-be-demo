@@ -7,7 +7,7 @@ export const environment = {
   defaultAvatarUrl: 'https://www.caspianpolicy.org/no-image.png',
   auth: {
     tokenUrl: '/oauth2/token',
-    clientId: 'admin',
+    clientId: 'testing',
     clientSecret: 'password',
     grantType: 'custom_password'
   }

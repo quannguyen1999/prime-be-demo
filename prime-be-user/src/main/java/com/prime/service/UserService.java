@@ -17,4 +17,6 @@ public interface UserService {
 
     Map<UUID, String> getListUserNames(List<UUID> uuids);
 
+    UserResponse findUserByUsername(String username);
+
 }

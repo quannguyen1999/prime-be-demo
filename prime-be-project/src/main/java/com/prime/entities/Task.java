@@ -15,13 +15,15 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class Task extends CommonBaseEntities{
+public class Task extends CommonBaseEntities {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "char(36)")
     @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
+    @Column(columnDefinition = "char(36)")
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID projectId;
 
     private String title;
@@ -31,7 +33,9 @@ public class Task extends CommonBaseEntities{
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
+    @Column(columnDefinition = "char(36)")
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID assignedTo;
-   
+
 
 }

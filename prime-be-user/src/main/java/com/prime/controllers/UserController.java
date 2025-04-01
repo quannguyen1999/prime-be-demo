@@ -7,15 +7,14 @@ import com.prime.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.prime.constants.PathApi.USER_LIST_USER_NAME;
+import static com.prime.constants.PathApi.FIND_USER_NAME;
+import static com.prime.constants.PathApi.LIST_USER_NAME;
 
 @RestController
 @RequestMapping(value = PathApi.USER)
@@ -34,21 +33,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.listUser(page, size));
     }
 
-    @PutMapping(value = "/update-user")
+    @PutMapping
     public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest userRequest) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-
-        }
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequest));
     }
 
     /**
      * Response: UUID of Id User, username of User
      */
-    @PostMapping(value = USER_LIST_USER_NAME)
+    @PostMapping(value = LIST_USER_NAME)
     public ResponseEntity<Map<UUID, String>> getListUserNames(@RequestBody List<UUID> uuids) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getListUserNames(uuids));
+    }
+
+
+    @GetMapping(value = FIND_USER_NAME)
+    public ResponseEntity<UserResponse> findUserByUsername(@RequestParam String username) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserByUsername(username));
     }
 
 }

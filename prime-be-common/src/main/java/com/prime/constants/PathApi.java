@@ -6,7 +6,8 @@ package com.prime.constants;
 public interface PathApi {
     String PROJECT = "/projects";
     String USER = "/users";
-    String USER_LIST_USER_NAME = "/getListUserNames";
+    String LIST_USER_NAME = "/getListUserNames";
+    String FIND_USER_NAME = "/findUserByName";
     String TASK = "/tasks";
     String AUTHENTICATOR_PATH = "/authenticator";
     String AUTHORIZE_PATH = "/oauth2/authorize";

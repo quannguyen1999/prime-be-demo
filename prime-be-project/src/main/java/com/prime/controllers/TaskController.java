@@ -38,14 +38,13 @@ public class TaskController {
     /**
      * Retrieves a paginated list of tasks.
      *
-     * @param page The page number (zero-based index).
-     * @param size The number of tasks per page.
+     * @param projectId The project Id (zero-based index).
      * @return ResponseEntity with a list of tasks and HTTP 200 status.
      */
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> getListTask(@RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<List<TaskResponse>> getListTaskByProjectId(@RequestParam UUID projectId, @RequestParam Boolean byMe) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(taskService.listTask(page, size));
+                .body(taskService.listTask(projectId, byMe));
     }
 
     /**

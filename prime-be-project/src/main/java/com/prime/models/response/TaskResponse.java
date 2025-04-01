@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 public class TaskResponse {
 
-    private UUID taskId;
+    private UUID id;
 
     private UUID projectId;
 

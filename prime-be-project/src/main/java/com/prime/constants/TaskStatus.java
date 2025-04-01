@@ -4,7 +4,9 @@ package com.prime.constants;
  * Define Task Status
  */
 public enum TaskStatus {
-    TO_DO,
-    IN_PROGRESS,
-    DONE
+    BACK_LOG,
+    DOING,
+    ON_HOLD,
+    DONE,
+    ARCHIVED
 }

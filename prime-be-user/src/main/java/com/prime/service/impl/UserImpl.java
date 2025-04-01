@@ -79,4 +79,10 @@ public class UserImpl implements UserService {
                         row -> (String) row[1] // Convert second column to String
                 ));
     }
+
+    @Override
+    public UserResponse findUserByUsername(String username) {
+        User user = userRepository.findUserByUsername(username);
+        return ObjectUtils.isEmpty(user) ? null : MAPPER.userToUserResponse(user);
+    }
 }

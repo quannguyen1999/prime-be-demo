@@ -10,7 +10,7 @@ public interface TaskService {
 
     TaskResponse createTask(TaskRequest taskRequest);
 
-    List<TaskResponse> listTask(Integer page, Integer size);
+    List<TaskResponse> listTask(UUID projectID, Boolean byMe);
 
     void deleteTask(UUID taskId);
 

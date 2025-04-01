@@ -3,6 +3,9 @@ package com.prime.models.request;
 
 import com.prime.constants.TaskStatus;
 import lombok.Data;
+
+import java.util.UUID;
+
 @Data
 public class TaskRequest {
 
@@ -12,6 +15,8 @@ public class TaskRequest {
 
     private TaskStatus status;
 
-    private String userName;
+    private String assignedTo;
+
+    private UUID projectId;
 
 }

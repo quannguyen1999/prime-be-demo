@@ -1,103 +1,131 @@
-<!-- Header -->
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">Projects</h1>
-    <div class="flex items-center space-x-4">
-        <!-- Search -->
-        <div class="relative">
-            <input type="text" 
-                   placeholder="Search Projects" 
-                   class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                   [(ngModel)]="searchTerm"
-                   (ngModelChange)="onSearch()">
-            <span class="absolute left-3 top-2.5 text-gray-400">
-                <mat-icon>search</mat-icon>
-            </span>
-        </div>
-        <!-- Add Project Button -->
-        <button mat-raised-button 
-                color="primary" 
-                class="flex items-center space-x-1"
-                (click)="openAddProjectDialog()">
-            <mat-icon>add</mat-icon>
-            <span>New Project</span>
-        </button>
+<div class="p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-medium text-gray-900">Projects</h1>
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</mat-icon>
+        <input type="text" 
+               [(ngModel)]="searchTerm"
+               (keyup.enter)="onSearch()"
+               placeholder="Search Projects"
+               class="pl-10 pr-4 py-2 w-[300px] border rounded-lg focus:outline-none focus:border-[#4355B9] text-sm">
+      </div>
+      <button mat-flat-button 
+              class="bg-[#4355B9] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm"
+              (click)="openAddProjectDialog()">
+        <mat-icon class="text-sm h-4 w-4">add</mat-icon>
+        New Project
+      </button>
     </div>
-</div>
+  </div>
 
-<!-- Table -->
-<div class="bg-white rounded-lg shadow overflow-hidden">
+  <!-- Table -->
+  <div class="bg-white rounded-lg overflow-hidden">
     <table mat-table [dataSource]="dataSource" class="w-full">
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef class="font-semibold">NAME</th>
-            <td mat-cell *matCellDef="let project" class="cursor-pointer hover:text-blue-600" (click)="viewProjectDetails(project.id)">
-                {{project.name}}
-            </td>
-        </ng-container>
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">NAME</th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4 text-sm">
+          <a (click)="viewProjectDetails(project.id)" class="text-[#4355B9] hover:underline cursor-pointer">
+            {{project.name}}
+          </a>
+        </td>
+      </ng-container>
 
-        <!-- Description Column -->
-        <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef class="font-semibold">DESCRIPTION</th>
-            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.description}}</td>
-        </ng-container>
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">DESCRIPTION</th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4 text-sm">{{project.description}}</td>
+      </ng-container>
 
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef class="font-semibold">STATUS</th>
-            <td mat-cell *matCellDef="let project">
-                <span [class]="getStatusColor(project.status)"
-                      class="px-2 py-1 rounded-full text-xs font-medium">
-                    {{project.status}}
-                </span>
-            </td>
-        </ng-container>
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">STATUS</th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4">
+          <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            In Progress
+          </span>
+        </td>
+      </ng-container>
 
-        <!-- Created At Column -->
-        <ng-container matColumnDef="createdAt">
-            <th mat-header-cell *matHeaderCellDef class="font-semibold">CREATED</th>
-            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.createdAt | date:'MMM d, y'}}</td>
-        </ng-container>
+      <!-- Created Column -->
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">CREATED</th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4 text-sm">
+          {{project.createAt | date:'MMM d, yyyy'}}
+        </td>
+      </ng-container>
 
-        <!-- Updated At Column -->
-        <ng-container matColumnDef="updatedAt">
-            <th mat-header-cell *matHeaderCellDef class="font-semibold">UPDATED</th>
-            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.updatedAt | date:'MMM d, y'}}</td>
-        </ng-container>
+      <!-- Updated Column -->
+      <ng-container matColumnDef="updated">
+        <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">UPDATED</th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4 text-sm">
+          {{project.updatedAt | date:'MMM d, yyyy'}}
+        </td>
+      </ng-container>
 
-        <!-- Username Column -->
-        <ng-container matColumnDef="username">
-            <th mat-header-cell *matHeaderCellDef class="font-semibold">OWNER</th>
-            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.username}}</td>
-        </ng-container>
+      <!-- Owner Column -->
+      <ng-container matColumnDef="owner">
+        <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">OWNER</th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4 text-sm">{{project.ownerUsername}}</td>
+      </ng-container>
 
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let project">
-                <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400 hover:text-gray-600">
-                    <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu" class="rounded-lg">
-                    <button mat-menu-item (click)="editProject(project)" class="text-sm">
-                        <mat-icon class="text-gray-500">edit</mat-icon>
-                        <span>Edit</span>
-                    </button>
-                    <button mat-menu-item (click)="deleteProject(project)" class="text-sm">
-                        <mat-icon class="text-gray-500">delete</mat-icon>
-                        <span>Delete</span>
-                    </button>
-                </mat-menu>
-            </td>
-        </ng-container>
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="bg-white px-6 py-3 border-b"></th>
+        <td mat-cell *matCellDef="let project" class="px-6 py-4">
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="editProject(project)">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item (click)="deleteProject(project)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-            class="hover:bg-gray-50 transition-colors duration-150"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+          class="border-b border-gray-100 hover:bg-gray-50"></tr>
     </table>
 
-    <!-- Paginator -->
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
-                   showFirstLastButtons
-                   aria-label="Select page of projects">
-    </mat-paginator>
+    <!-- Footer with Pagination -->
+    <div class="px-6 py-3 flex items-center justify-between border-t">
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-600">Items per page:</span>
+        <mat-form-field appearance="outline" class="w-16">
+          <mat-select [value]="pageSize" (selectionChange)="onPageSizeChange($event)">
+            <mat-option [value]="5">5</mat-option>
+            <mat-option [value]="10">10</mat-option>
+            <mat-option [value]="25">25</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-gray-600">
+          {{totalElements === 0 ? '0 of 0' : (pageIndex * pageSize) + 1 + ' - ' + Math.min((pageIndex + 1) * pageSize, totalElements) + ' of ' + totalElements}}
+        </span>
+        <div class="flex gap-2">
+          <button mat-icon-button 
+                  [disabled]="pageIndex === 0"
+                  (click)="onPageChange({pageIndex: pageIndex - 1, pageSize: pageSize, length: totalElements})">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  [disabled]="(pageIndex + 1) * pageSize >= totalElements"
+                  (click)="onPageChange({pageIndex: pageIndex + 1, pageSize: pageSize, length: totalElements})">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class ProjectResponse {
+public class ProjectResponse extends CommonBaseResponse {
     private UUID id;
 
     private String name;
