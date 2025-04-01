@@ -1,5 +1,7 @@
 package com.prime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -14,7 +16,9 @@ import java.time.LocalDateTime;
  */
 @SpringBootApplication
 public class GatewayApplication {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(GatewayApplication.class);
+
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayApplication.class, args);
 	}
@@ -31,19 +35,25 @@ public class GatewayApplication {
 		return routeLocatorBuilder.routes()
 				// Route for User Service
 				.route(p -> p
-						.path("/userService/**") // Matches requests starting with "/userService/"
-						.filters(f -> f.rewritePath("/userService/(?<segment>.*)", "/${segment}") // Removes the prefix before forwarding
-								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()) // Adds a custom response header
+						.path("/user-service/**")
+						.filters(f -> f
+										.rewritePath("/user-service/(?<segment>.*)", "/${segment}")
+										.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+										.retry(3)
+//								.setResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR, "Service unavailable")
 						)
-						.uri("lb://PRIME-USER-SERVICE")) // Load balances to PRIME-USER-SERVICE
+						.uri("lb://PRIME-USER-SERVICE"))
 
 				// Route for Project Service
 				.route(p -> p
-						.path("/projectService/**") // Matches requests starting with "/projectService/"
-						.filters(f -> f.rewritePath("/projectService/(?<segment>.*)", "/${segment}") // Removes the prefix before forwarding
-								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()) // Adds a custom response header
+						.path("/project-service/**")
+						.filters(f -> f
+										.rewritePath("/project-service/(?<segment>.*)", "/${segment}")
+										.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+										.retry(3)
+//								.setResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR, "Service unavailable")
 						)
-						.uri("lb://PRIME-USER-PROJECT")) // Load balances to PRIME-USER-PROJECT
+						.uri("lb://PRIME-USER-PROJECT"))
 				.build();
 	}
 }

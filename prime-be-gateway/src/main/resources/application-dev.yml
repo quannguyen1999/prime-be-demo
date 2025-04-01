@@ -3,11 +3,18 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false  # Disables automatic service discovery for routes (manual routing is used in GatewayApplication)
-          lowerCaseServiceId: true  # Converts service IDs to lowercase for consistency
+          enabled: false
+          lowerCaseServiceId: true
       httpclient:
         connect-timeout: 1000  # Sets HTTP client connection timeout to 1000ms (1 second)
         response-timeout: 2s  # Sets the maximum response wait time to 2 seconds
+    globalcors:
+      cors-configurations:
+        '[/**]': # Applies to all paths
+          allowedOrigins: "*"
+          allowedMethods: GET, POST, PUT, DELETE, OPTIONS
+          allowedHeaders: "*"
+          allowCredentials: true
 
 # Eureka Client Configuration
 eureka:
@@ -17,3 +24,12 @@ eureka:
     registerWithEureka: true  # Registers this service with Eureka
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/  # URL of the Eureka server for service registration & discovery
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true

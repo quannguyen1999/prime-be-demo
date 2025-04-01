@@ -2,12 +2,16 @@ package com.prime.feignClient;
 
 import com.prime.feignClient.fallBack.UserFallback;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
-@FeignClient(name = "user", url = "${custom.user.url}", fallback = UserFallback.class)
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@FeignClient(name = "prime-user-service", fallback = UserFallback.class)
 public interface UserServiceClient {
 
-    @GetMapping(value = "/email")
-    void sendMail();
+    @PostMapping(value = "/users/getListUserNames")
+    Map<UUID, String> getUsernameUsers(List<UUID> listUserId);
 
 }

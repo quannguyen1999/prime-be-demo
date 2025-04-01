@@ -1,6 +1,6 @@
 <!-- Header -->
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">Manage Projects</h1>
+    <h1 class="text-2xl font-semibold text-gray-800">Projects</h1>
     <div class="flex items-center space-x-4">
         <!-- Search -->
         <div class="relative">
@@ -19,7 +19,7 @@
                 class="flex items-center space-x-1"
                 (click)="openAddProjectDialog()">
             <mat-icon>add</mat-icon>
-            <span>Add Project</span>
+            <span>New Project</span>
         </button>
     </div>
 </div>
@@ -29,60 +29,70 @@
     <table mat-table [dataSource]="dataSource" class="w-full">
         <!-- Name Column -->
         <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>NAME</th>
-            <td mat-cell *matCellDef="let project">
-                <a [routerLink]="['/project', project.id]" class="text-blue-600 hover:text-blue-800 hover:underline">
-                    {{project.name}}
-                </a>
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">NAME</th>
+            <td mat-cell *matCellDef="let project" class="cursor-pointer hover:text-blue-600" (click)="viewProjectDetails(project.id)">
+                {{project.name}}
             </td>
         </ng-container>
 
         <!-- Description Column -->
         <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>DESCRIPTION</th>
-            <td mat-cell *matCellDef="let project">{{project.description}}</td>
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">DESCRIPTION</th>
+            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.description}}</td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">STATUS</th>
+            <td mat-cell *matCellDef="let project">
+                <span [class]="getStatusColor(project.status)"
+                      class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{project.status}}
+                </span>
+            </td>
         </ng-container>
 
         <!-- Created At Column -->
         <ng-container matColumnDef="createdAt">
-            <th mat-header-cell *matHeaderCellDef>CREATED AT</th>
-            <td mat-cell *matCellDef="let project">{{project.createdAt | date:'MMM d, y'}}</td>
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">CREATED</th>
+            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.createdAt | date:'MMM d, y'}}</td>
         </ng-container>
 
         <!-- Updated At Column -->
         <ng-container matColumnDef="updatedAt">
-            <th mat-header-cell *matHeaderCellDef>UPDATED AT</th>
-            <td mat-cell *matCellDef="let project">{{project.updatedAt | date:'MMM d, y'}}</td>
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">UPDATED</th>
+            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.updatedAt | date:'MMM d, y'}}</td>
         </ng-container>
 
         <!-- Username Column -->
         <ng-container matColumnDef="username">
-            <th mat-header-cell *matHeaderCellDef>CREATED BY</th>
-            <td mat-cell *matCellDef="let project">{{project.username}}</td>
+            <th mat-header-cell *matHeaderCellDef class="font-semibold">OWNER</th>
+            <td mat-cell *matCellDef="let project" class="text-gray-600">{{project.username}}</td>
         </ng-container>
 
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let project">
-                <button mat-icon-button [matMenuTriggerFor]="menu">
+                <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400 hover:text-gray-600">
                     <mat-icon>more_vert</mat-icon>
                 </button>
-                <mat-menu #menu="matMenu">
-                    <button mat-menu-item (click)="editProject(project)">
-                        <mat-icon>edit</mat-icon>
+                <mat-menu #menu="matMenu" class="rounded-lg">
+                    <button mat-menu-item (click)="editProject(project)" class="text-sm">
+                        <mat-icon class="text-gray-500">edit</mat-icon>
                         <span>Edit</span>
                     </button>
-                    <button mat-menu-item (click)="deleteProject(project)">
-                        <mat-icon>delete</mat-icon>
+                    <button mat-menu-item (click)="deleteProject(project)" class="text-sm">
+                        <mat-icon class="text-gray-500">delete</mat-icon>
                         <span>Delete</span>
                     </button>
                 </mat-menu>
             </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+            class="hover:bg-gray-50 transition-colors duration-150"></tr>
     </table>
 
     <!-- Paginator -->

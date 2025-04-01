@@ -1,7 +1,7 @@
 export interface Menu {
-    id: number,
-    typeIcon: string,
-    value: string,
-    isSelected: boolean,
-    url: string
+    id: number;
+    name: string;
+    url: string;
+    icon: string;
+    isSelected: boolean;
 }

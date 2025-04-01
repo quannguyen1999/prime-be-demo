@@ -17,15 +17,21 @@ public class UserValidator extends  CommonValidator{
     private final UserRepository userRepository;
 
     public void validateCreate(UserRequest userRequest) {
-        checkEmpty().accept(userRequest, PRODUCT_INVALID);
+        checkEmpty().accept(userRequest, USER_INVALID);
         validateCheckUserName(userRequest.getUsername());
         validateCheckPassword(userRequest.getPassword());
+        validateCheckEmail(userRequest.getEmail());
     }
 
     private void validateCheckUserName(String name) {
         checkEmpty().accept(name, USER_NAME_INVALID);
         checkCondition().accept(name.length() < NAME_SIZE, USER_NAME_INVALID);
         checkCondition().accept(!ObjectUtils.isEmpty(userRepository.findByUsername(name)), USER_NAME_EXISTS);
+    }
+
+    private void validateCheckEmail(String email) {
+        checkEmpty().accept(email, USER_EMAIL_INVALID);
+        checkCondition().accept(!ObjectUtils.isEmpty(userRepository.findByEmail(email)), USER_EMAIL_EXISTS);
     }
 
     private void validateCheckPassword(String password) {

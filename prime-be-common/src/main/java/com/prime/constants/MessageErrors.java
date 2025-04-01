@@ -4,24 +4,25 @@ package com.prime.constants;
  * Description: Define ALl Error Messages
  */
 public enum MessageErrors {
-    // Pagination-related errors
-    PAGE_INVALID, // Indicates that the requested page number is invalid
-    SIZE_INVALID, // Indicates that the requested page size is invalid
-
-    // Authentication & Authorization errors
-    ACCOUNT_USERNAME_OR_PASS_INVALID, // Incorrect username or password
-
-    // Product-related errors
-    PRODUCT_INVALID, // General product validation failure
-    PRODUCT_ID_NOT_FOUND, // No product found with the given ID
-    PRODUCT_NAME_INVALID, // The provided product name is invalid
-    PRODUCT_DESCRIPTION_INVALID, // The provided product description is invalid
-
-    // Task-related errors
-    TASK_INVALID, // General task validation failure
-    TASK_NOT_EXISTS, // The requested task does not exist
-    TASK_TITLE_INVALID, // The provided task title is invalid
-    TASK_DESCRIPTION_INVALID, // The provided task description is invalid
-    TASK_USER_NAME_INVALID // The assigned username for the task is invalid
+    USER_SERVER_ERROR,
+    PAGE_INVALID,
+    SIZE_INVALID,
+    USER_UNAUTHORIZED,
+    ACCOUNT_USERNAME_OR_PASS_INVALID,
+    PRODUCT_INVALID,
+    PRODUCT_ID_NOT_FOUND,
+    PRODUCT_NAME_INVALID,
+    PRODUCT_DESCRIPTION_INVALID,
+    USER_INVALID,
+    USER_NAME_INVALID,
+    USER_NAME_EXISTS,
+    USER_PASSWORD_INVALID,
+    USER_EMAIL_INVALID,
+    USER_EMAIL_EXISTS,
+    TASK_INVALID,
+    TASK_NOT_EXISTS,
+    TASK_TITLE_INVALID,
+    TASK_DESCRIPTION_INVALID,
+    TASK_USER_NAME_INVALID;
 
 }

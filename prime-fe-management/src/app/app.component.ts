@@ -1,48 +1,45 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { RouterModule } from '@angular/router';
-import { SharedModule } from './shared/shared.module';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './components/header/header.component';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
 import { SidebarService } from './services/sidebar.service';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  template: `
+    <ng-container *ngIf="!isLoginPage(); else loginTemplate">
+      <app-header></app-header>
+      <div class="flex min-h-screen bg-gray-50">
+        <app-side-bar></app-side-bar>
+        <main [class]="isExpanded ? 'ml-[230px]' : 'ml-[45px]'" 
+              class="flex-1 p-8 mt-16 transition-all duration-300">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </ng-container>
+    <ng-template #loginTemplate>
+      <router-outlet></router-outlet>
+    </ng-template>
+  `,
+  styles: [`
+    :host {
+      display: block;
+    }
+  `],
   standalone: true,
-  imports: [
-    RouterModule,
-    SharedModule,
-    HeaderComponent,
-    SideBarComponent
-  ]
+  imports: [RouterOutlet, CommonModule, HeaderComponent, SideBarComponent]
 })
-export class AppComponent implements OnInit {
-  title = 'prime-fe-management';
+export class AppComponent {
+  isExpanded = false;
 
-  maxWidth: string = '1300px';
-  currentTabMenu: boolean = true;
-  isLoginPage = false;
-  isSecure: boolean = false;
-  isLoading: boolean = true;
-  isExpandedSidebar = false;
-
-  constructor(
-    private sidebarService: SidebarService,
-    private router: Router
-  ) {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.isLoginPage = event.url === '/login';
-    });
+  constructor(private sidebarService: SidebarService) {
+    this.sidebarService.isExpanded$.subscribe(
+      expanded => this.isExpanded = expanded
+    );
   }
 
-  ngOnInit() {
-    this.sidebarService.isExpanded$.subscribe(
-      isExpanded => this.isExpandedSidebar = isExpanded
-    );
+  isLoginPage(): boolean {
+    return window.location.pathname === '/login' || window.location.pathname === '/register';
   }
 }

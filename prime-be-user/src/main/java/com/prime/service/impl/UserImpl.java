@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.prime.mappers.UserMapper.MAPPER;
@@ -44,5 +46,15 @@ public class UserImpl implements UserService {
                 .stream()
                 .map(MAPPER::userToUserResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<UUID, String> getListUserNames(List<UUID> uuids) {
+        List<Object[]> results = userRepository.findUserIdAndUsernameByIds(uuids);
+        return results.stream()
+                .collect(Collectors.toMap(
+                        row -> (UUID) row[0],  // Convert first column to UUID
+                        row -> (String) row[1] // Convert second column to String
+                ));
     }
 }

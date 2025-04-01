@@ -8,39 +8,54 @@ import { ProjectListComponent } from './components/project/project-list/project-
 import { TaskListComponent } from './components/tasks/task-list/task-list.component';
 import { PageNotFoundComponent } from './components/errors/page-not-found/page-not-found.component';
 import { ProjectDetailsComponent } from './components/project/project-detail/project-detail.component';
+import { AuthGuard } from './guards/auth.guard';
+import { NoAuthGuard } from './guards/no-auth.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
     path: 'home',
-    component: DashboardComponent
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [NoAuthGuard]
   },
   {
     path: 'register',
-    component: RegisterComponent
+    component: RegisterComponent,
+    canActivate: [NoAuthGuard]
   },
   {
-    path: 'users',
-    component: UserListComponent
+    path: 'team',
+    component: UserListComponent,
+    canActivate: [AuthGuard]
   },
   {
-    path: 'project',
-    component: ProjectListComponent
+    path: 'projects',
+    component: ProjectListComponent,
+    canActivate: [AuthGuard]
   },
   {
-    path: 'project/:id',
-    component: ProjectDetailsComponent
+    path: 'projects/:id',
+    component: ProjectDetailsComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'tasks',
-    component: TaskListComponent
+    component: TaskListComponent,
+    canActivate: [AuthGuard]
   },
   {
-    path: '',
-    redirectTo: 'home', pathMatch: 'full'
+    path: 'settings',
+    redirectTo: 'home', // Temporary redirect until settings component is created
+    pathMatch: 'full'
   },
   {
     path: '**',

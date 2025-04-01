@@ -26,7 +26,9 @@ public class Project extends CommonBaseEntities{
 
     private String description;
 
+    @Column(columnDefinition = "char(36)")
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID ownerId;
 
-    
+
 }

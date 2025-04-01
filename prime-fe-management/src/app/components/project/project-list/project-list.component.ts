@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddProjectDialogComponent } from '../add-project-dialog/add-project-dialog.component';
 import { CommonModule } from '@angular/common';
@@ -22,6 +23,7 @@ interface Project {
   updatedAt: Date;
   userId: string;
   username: string;
+  status: 'In Progress' | 'Completed' | 'On Hold';
 }
 
 @Component({
@@ -41,7 +43,7 @@ interface Project {
   ]
 })
 export class ProjectListComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'description', 'createdAt', 'updatedAt', 'username', 'actions'];
+  displayedColumns: string[] = ['name', 'description', 'status', 'createdAt', 'updatedAt', 'username', 'actions'];
   dataSource: MatTableDataSource<Project>;
   searchTerm: string = '';
   isExpandedSidebar = false;
@@ -50,6 +52,7 @@ export class ProjectListComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
+    private router: Router,
     private sidebarService: SidebarService
   ) {
     // Sample data - replace with actual API call
@@ -61,7 +64,8 @@ export class ProjectListComponent implements OnInit {
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-03-15'),
         userId: 'c3e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        username: 'John Doe'
+        username: 'John Doe',
+        status: 'In Progress'
       },
       {
         id: 'p2d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
@@ -70,7 +74,8 @@ export class ProjectListComponent implements OnInit {
         createdAt: new Date('2024-02-15'),
         updatedAt: new Date('2024-03-14'),
         userId: 'b4d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        username: 'Jane Smith'
+        username: 'Jane Smith',
+        status: 'Completed'
       }
     ];
     this.dataSource = new MatTableDataSource(projects);
@@ -87,7 +92,8 @@ export class ProjectListComponent implements OnInit {
       const searchStr = filter.toLowerCase();
       return data.name.toLowerCase().includes(searchStr) ||
              data.description.toLowerCase().includes(searchStr) ||
-             data.username.toLowerCase().includes(searchStr);
+             data.username.toLowerCase().includes(searchStr) ||
+             data.status.toLowerCase().includes(searchStr);
     };
   }
 
@@ -112,7 +118,8 @@ export class ProjectListComponent implements OnInit {
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: 'c3e1a5a0-5398-4697-bbe6-00c90da7d8b5', // This should come from auth service
-          username: 'John Doe' // This should come from auth service
+          username: 'John Doe', // This should come from auth service
+          status: 'In Progress'
         };
         
         // Add the new project to the table
@@ -125,6 +132,10 @@ export class ProjectListComponent implements OnInit {
     });
   }
 
+  viewProjectDetails(projectId: string): void {
+    this.router.navigate(['/projects', projectId]);
+  }
+
   editProject(project: Project): void {
     // TODO: Implement edit logic
     console.log('Editing project:', project);
@@ -133,5 +144,18 @@ export class ProjectListComponent implements OnInit {
   deleteProject(project: Project): void {
     // TODO: Implement delete logic
     console.log('Deleting project:', project);
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'In Progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'Completed':
+        return 'bg-green-100 text-green-800';
+      case 'On Hold':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   }
 }

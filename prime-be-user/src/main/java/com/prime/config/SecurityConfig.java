@@ -186,7 +186,7 @@ public class SecurityConfig {
 
             Authentication principal = context.getPrincipal();
             CustomPasswordUser user = principal.getDetails() instanceof CustomPasswordUser ? (CustomPasswordUser) principal.getDetails() : null;
-            context.getClaims().claim("Test", "Test Access Token");
+//            context.getClaims().claim("Test", "Test Access Token");
 
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType()) && ObjectUtils.isEmpty(user)) {
                 authorities = principal.getAuthorities().stream()
@@ -196,9 +196,10 @@ public class SecurityConfig {
                 authorities = user.authorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
                 username = user.username();
             }
-
             context.getClaims().claim("authorities", authorities)
-                    .claim("user", username);
+                    .claim("user", username)
+                    .claim("id", user.id())
+            ;
         };
     }
 

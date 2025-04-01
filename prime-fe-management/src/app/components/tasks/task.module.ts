@@ -10,15 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
-
 import { TaskListComponent } from './task-list/task-list.component';
 import { AddTaskDialogComponent } from './add-task-dialog/add-task-dialog.component';
 
 @NgModule({
-  declarations: [
-    TaskListComponent,
-    AddTaskDialogComponent
-  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -31,10 +26,9 @@ import { AddTaskDialogComponent } from './add-task-dialog/add-task-dialog.compon
     MatFormFieldModule,
     MatDialogModule,
     MatMenuModule,
-    MatSelectModule
-  ],
-  exports: [
-    TaskListComponent
+    MatSelectModule,
+    TaskListComponent,
+    AddTaskDialogComponent
   ]
 })
 export class TaskModule { } 

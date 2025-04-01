@@ -4,6 +4,7 @@ package com.prime.constants;
  * Define Error message
  */
 public enum MessageErrors {
+    USER_SERVER_ERROR,
     //Common
     PAGE_INVALID,
     SIZE_INVALID,

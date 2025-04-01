@@ -18,7 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
         width: '230px'
       })),
       state('collapsed', style({
-        width: '45px'
+        width: '55px'
       })),
       transition('expanded <=> collapsed', [
         animate('0.3s ease-in-out')
