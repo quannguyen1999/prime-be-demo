@@ -1,5 +1,7 @@
 package com.prime.utils;
 
+import com.prime.constants.MessageErrors;
+import com.prime.exceptions.UnauthorizedRequestException;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +42,7 @@ public class SecurityUtil {
             return !ObjectUtils.isEmpty(value) ? value.toString() : null;
         }
 
-        return null;
+        throw new UnauthorizedRequestException(MessageErrors.UNAUTHORIZED);
     }
 
 

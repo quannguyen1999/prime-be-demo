@@ -11,6 +11,7 @@ import com.prime.validators.ProjectValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,7 @@ public class ProjectImpl implements ProjectService {
 
         Project project = MAPPER.projectRequestToProject(projectRequest);
         project.setOwnerId(SecurityUtil.getIDUser());
+
         //Insert Project and convert values
         ProjectResponse response = MAPPER.projectToProjectResponse(projectRepository.save(project));
         response.setOwnerUsername(SecurityUtil.getUserName());
@@ -70,10 +72,14 @@ public class ProjectImpl implements ProjectService {
         projectValidator.validateUpdate(projectRequest, projectId);
 
         Project project = projectRepository.findById(projectId).get();
-        project.setDescription(projectRequest.getDescription());
-        project.setName(projectRequest.getName());
+        if (StringUtils.hasLength(projectRequest.getDescription())) {
+            project.setDescription(projectRequest.getDescription());
+        }
+        if (StringUtils.hasLength(projectRequest.getName())) {
+            project.setName(projectRequest.getName());
+        }
+
         project = projectRepository.save(project);
-        
         ProjectResponse projectResponse = MAPPER.projectToProjectResponse(project);
         Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(Collections.singletonList(projectResponse.getOwnerId()));
         projectResponse.setOwnerUsername(getListUserNames.get(projectResponse.getOwnerId()));

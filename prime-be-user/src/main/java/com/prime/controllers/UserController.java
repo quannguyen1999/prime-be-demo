@@ -7,6 +7,8 @@ import com.prime.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +32,15 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponse>> getListUser(@RequestParam Integer page, @RequestParam Integer size) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.listUser(page, size));
+    }
+
+    @PutMapping(value = "/update-user")
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest userRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRequest));
     }
 
     /**

@@ -1,15 +1,19 @@
 package com.prime.service.impl;
 
+import com.prime.constants.UserRole;
 import com.prime.entities.User;
 import com.prime.models.request.UserRequest;
 import com.prime.models.response.UserResponse;
 import com.prime.repositories.UserRepository;
 import com.prime.service.UserService;
+import com.prime.utils.SecurityUtil;
 import com.prime.validators.UserValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,7 @@ public class UserImpl implements UserService {
         //Validate create user
         userValidator.validateCreate(userRequest);
         userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        userRequest.setRole(UserRole.USER);
         User user = userRepository.save(MAPPER.userRequestToUser(userRequest));
         return MAPPER.userToUserResponse(user);
     }
@@ -46,6 +51,23 @@ public class UserImpl implements UserService {
                 .stream()
                 .map(MAPPER::userToUserResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserResponse updateUser(UserRequest userRequest) {
+        //Validate list user
+        userValidator.validateUpdate(userRequest);
+
+        User user = userRepository.findById(SecurityUtil.getIDUser()).get();
+        if (StringUtils.hasLength(userRequest.getEmail())) {
+            user.setEmail(userRequest.getEmail());
+        }
+        if (!ObjectUtils.isEmpty(userRequest.getRole())) {
+            user.setRole(userRequest.getRole());
+        }
+
+        user = userRepository.save(user);
+        return MAPPER.userToUserResponse(user);
     }
 
     @Override

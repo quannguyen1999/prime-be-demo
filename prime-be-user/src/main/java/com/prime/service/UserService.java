@@ -13,6 +13,8 @@ public interface UserService {
 
     List<UserResponse> listUser(Integer page, Integer size);
 
+    UserResponse updateUser(UserRequest userRequest);
+
     Map<UUID, String> getListUserNames(List<UUID> uuids);
 
 }

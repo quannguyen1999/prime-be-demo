@@ -5,6 +5,7 @@ import com.prime.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import static com.prime.constants.MessageErrors.*;
 
@@ -23,6 +24,17 @@ public class UserValidator extends  CommonValidator{
         validateCheckEmail(userRequest.getEmail());
     }
 
+    public void validateUpdate(UserRequest userRequest) {
+        checkEmpty().accept(userRequest, USER_INVALID);
+        if (StringUtils.hasLength(userRequest.getUsername())) {
+            checkCondition().accept(userRequest.getUsername().length() < NAME_SIZE, USER_NAME_INVALID);
+            checkCondition().accept(ObjectUtils.isEmpty(userRepository.findByUsername(userRequest.getUsername())), USER_NOT_EXISTS);
+        }
+        if (StringUtils.hasLength(userRequest.getEmail())) {
+            checkCondition().accept(ObjectUtils.isEmpty(userRepository.findByEmail(userRequest.getEmail())), USER_EMAIL_EXISTS);
+        }
+    }
+
     private void validateCheckUserName(String name) {
         checkEmpty().accept(name, USER_NAME_INVALID);
         checkCondition().accept(name.length() < NAME_SIZE, USER_NAME_INVALID);
@@ -31,7 +43,7 @@ public class UserValidator extends  CommonValidator{
 
     private void validateCheckEmail(String email) {
         checkEmpty().accept(email, USER_EMAIL_INVALID);
-        checkCondition().accept(!ObjectUtils.isEmpty(userRepository.findByEmail(email)), USER_EMAIL_EXISTS);
+        checkCondition().accept(ObjectUtils.isEmpty(userRepository.findByEmail(email)), USER_EMAIL_EXISTS);
     }
 
     private void validateCheckPassword(String password) {

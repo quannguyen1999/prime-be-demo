@@ -4,6 +4,7 @@ package com.prime.constants;
  * Description: Define ALl Error Messages
  */
 public enum MessageErrors {
+    UNAUTHORIZED,
     USER_SERVER_ERROR,
     PAGE_INVALID,
     SIZE_INVALID,
@@ -14,7 +15,9 @@ public enum MessageErrors {
     PRODUCT_NAME_INVALID,
     PRODUCT_DESCRIPTION_INVALID,
     USER_INVALID,
+    USER_NOT_EXISTS,
     USER_NAME_INVALID,
+    USER_NAME_NOT_FOUND,
     USER_NAME_EXISTS,
     USER_PASSWORD_INVALID,
     USER_EMAIL_INVALID,

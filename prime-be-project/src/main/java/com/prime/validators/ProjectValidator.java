@@ -5,6 +5,7 @@ import com.prime.repositories.ProjectRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -28,9 +29,15 @@ public class ProjectValidator extends CommonValidator{
        validateUUID(projectUuid);
     }
 
-    public void validateUpdate(ProjectRequest projectRequest, UUID projectUUID){
+    public void validateUpdate(ProjectRequest projectRequest, UUID projectUUID) {
         validateUUID(projectUUID);
-        validateCreate(projectRequest);
+        if (StringUtils.hasLength(projectRequest.getName())) {
+            validateCheckName(projectRequest.getName());
+        }
+
+        if (StringUtils.hasLength(projectRequest.getDescription())) {
+            validateCheckDescription(projectRequest.getDescription());
+        }
     }
     
     private void validateUUID(UUID projectUuid) {
