@@ -9,6 +9,7 @@ spring:
         connect-timeout: 5000
         response-timeout: 30s
       default-filters:
+        # TODO need to change, this is only for temporary solve CORS
         # Remove any existing CORS headers
         - RemoveResponseHeader=Access-Control-Allow-Origin
         - RemoveResponseHeader=Access-Control-Allow-Methods
