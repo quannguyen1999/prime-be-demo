@@ -1,5 +1,6 @@
 package com.prime.service;
 
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.TaskRequest;
 import com.prime.models.response.TaskResponse;
 
@@ -10,7 +11,9 @@ public interface TaskService {
 
     TaskResponse createTask(TaskRequest taskRequest);
 
-    List<TaskResponse> listTask(UUID projectID, Boolean byMe);
+    List<TaskResponse> getAllTaskByProject(UUID projectID, Boolean byMe);
+
+    CommonPageInfo<TaskResponse> getTaskRoot(Integer page, Integer size, String nameTask);
 
     void deleteTask(UUID taskId);
 

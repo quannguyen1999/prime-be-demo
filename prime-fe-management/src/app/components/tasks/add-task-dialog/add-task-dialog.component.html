@@ -1,73 +1,93 @@
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-semibold">Add New Task</h2>
-        <button mat-icon-button (click)="onClose()">
+        <h2 class="text-2xl font-medium text-gray-900">Add New Task</h2>
+        <button mat-icon-button (click)="onCancel()">
             <mat-icon>close</mat-icon>
         </button>
     </div>
 
     <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
-        <!-- Title -->
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <input matInput formControlName="title" placeholder="Task Title *">
-            <mat-error *ngIf="taskForm.get('title')?.hasError('required')">
-                Task title is required
-            </mat-error>
-        </mat-form-field>
-
-        <!-- Project -->
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-select formControlName="projectId" placeholder="Project *">
-                <mat-option *ngFor="let project of projects" [value]="project.id">
-                    {{project.name}}
-                </mat-option>
-            </mat-select>
-            <mat-error *ngIf="taskForm.get('projectId')?.hasError('required')">
-                Project is required
-            </mat-error>
-        </mat-form-field>
-
-        <!-- Description -->
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <textarea matInput 
-                      formControlName="description" 
-                      placeholder="Task Description *"
-                      rows="4"></textarea>
-            <mat-error *ngIf="taskForm.get('description')?.hasError('required')">
-                Task description is required
-            </mat-error>
-        </mat-form-field>
-
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <!-- Status -->
+        <div class="space-y-4">
+            <!-- Title Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-select formControlName="status" placeholder="Status *">
-                    <mat-option *ngFor="let status of statuses" [value]="status">
-                        {{status}}
+                <mat-label>Task Title</mat-label>
+                <input matInput formControlName="title" placeholder="Enter task title" required>
+                <mat-error *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched">
+                    Task title is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Project Field -->
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Project</mat-label>
+                <input type="text"
+                       matInput
+                       formControlName="projectId"
+                       [matAutocomplete]="auto"
+                       placeholder="Search for a project">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProjectFn">
+                    <mat-option *ngFor="let project of (filteredProjects | async)?.data" [value]="project">
+                        {{project.name}}
                     </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="taskForm.get('projectId')?.invalid && taskForm.get('projectId')?.touched">
+                    Project is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Description Field -->
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" placeholder="Enter task description" rows="4" required></textarea>
+                <mat-error *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched">
+                    Description is required
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Status Field -->
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status" required>
+                    <mat-option value="BACK_LOG">Backlog</mat-option>
+                    <mat-option value="DOING">Doing</mat-option>
+                    <mat-option value="ON_HOLD">On Hold</mat-option>
+                    <mat-option value="DONE">Done</mat-option>
+                    <mat-option value="ARCHIVED">Archived</mat-option>
                 </mat-select>
-                <mat-error *ngIf="taskForm.get('status')?.hasError('required')">
+                <mat-error *ngIf="taskForm.get('status')?.invalid && taskForm.get('status')?.touched">
                     Status is required
                 </mat-error>
             </mat-form-field>
 
-            <!-- Assigned To -->
+            <!-- Assigned To Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-select formControlName="assignedToId" placeholder="Assigned To *">
-                    <mat-option *ngFor="let user of users" [value]="user.id">
-                        {{user.name}}
+                <mat-label>Assigned To</mat-label>
+                <input type="text"
+                       matInput
+                       formControlName="assignedTo"
+                       [matAutocomplete]="userAuto"
+                       placeholder="Search for a user">
+                <mat-autocomplete #userAuto="matAutocomplete" [displayWith]="displayUserFn">
+                    <mat-option *ngFor="let user of (filteredUsers | async)?.data" [value]="user">
+                        {{user.username}}
                     </mat-option>
-                </mat-select>
-                <mat-error *ngIf="taskForm.get('assignedToId')?.hasError('required')">
+                </mat-autocomplete>
+                <mat-error *ngIf="taskForm.get('assignedTo')?.invalid && taskForm.get('assignedTo')?.touched">
                     Assignee is required
                 </mat-error>
             </mat-form-field>
         </div>
 
-        <div class="flex justify-end mt-6">
-            <button mat-button type="button" (click)="onClose()" class="mr-2">Cancel</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="taskForm.invalid">
-                Create Task
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 mt-6">
+            <button mat-button type="button" (click)="onCancel()">
+                Cancel
+            </button>
+            <button mat-flat-button 
+                    color="primary" 
+                    type="submit"
+                    [disabled]="taskForm.invalid || isLoading">
+                {{isLoading ? 'Creating...' : 'Create Task'}}
             </button>
         </div>
     </form>

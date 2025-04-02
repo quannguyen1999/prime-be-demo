@@ -1,25 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { TaskService, Task } from '../../../services/task.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared.module';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddTaskDialogComponent } from '../add-task-dialog/add-task-dialog.component';
-
-interface Task {
-  id: string;
-  projectId: string;
-  projectName: string;
-  title: string;
-  description: string;
-  status: 'Todo' | 'In Progress' | 'Done';
-  assignedToId: string;
-  assignedToName: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { EditTaskDialogComponent } from '../edit-task-dialog/edit-task-dialog.component';
 
 @Component({
   selector: 'app-task-list',
@@ -34,66 +25,54 @@ interface Task {
   ]
 })
 export class TaskListComponent implements OnInit {
-  displayedColumns: string[] = ['title', 'projectName', 'description', 'status', 'assignedToName', 'actions'];
+  displayedColumns: string[] = ['title', 'description', 'status', 'assignedTo', 'createAt', 'updatedAt', 'actions'];
   dataSource: MatTableDataSource<Task>;
   searchTerm: string = '';
+  pageSize: number = 5;
+  pageIndex: number = 0;
+  totalElements: number = 0;
   isExpandedSidebar = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
+    private taskService: TaskService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private sidebarService: SidebarService
   ) {
-    // Sample data - replace with actual API call
-    const tasks: Task[] = [
-      {
-        id: 't1e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        projectId: 'p1e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        projectName: 'E-commerce Platform',
-        title: 'Implement User Authentication',
-        description: 'Add JWT-based authentication system',
-        status: 'In Progress',
-        assignedToId: 'c3e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        assignedToName: 'John Doe',
-        createdAt: new Date('2024-03-01'),
-        updatedAt: new Date('2024-03-15')
-      },
-      {
-        id: 't2d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        projectId: 'p2d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        projectName: 'CRM System',
-        title: 'Design Database Schema',
-        description: 'Create initial database design for customer data',
-        status: 'Todo',
-        assignedToId: 'b4d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        assignedToName: 'Jane Smith',
-        createdAt: new Date('2024-03-10'),
-        updatedAt: new Date('2024-03-10')
-      }
-    ];
-    this.dataSource = new MatTableDataSource(tasks);
+    this.dataSource = new MatTableDataSource<Task>();
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.loadTasks();
     this.sidebarService.isExpanded$.subscribe(
       isExpanded => this.isExpandedSidebar = isExpanded
     );
+  }
 
-    // Add custom filter predicate for search
-    this.dataSource.filterPredicate = (data: Task, filter: string) => {
-      const searchStr = filter.toLowerCase();
-      return data.title.toLowerCase().includes(searchStr) ||
-             data.description.toLowerCase().includes(searchStr) ||
-             data.projectName.toLowerCase().includes(searchStr) ||
-             data.assignedToName.toLowerCase().includes(searchStr) ||
-             data.status.toLowerCase().includes(searchStr);
-    };
+  loadTasks(): void {
+    this.taskService.getTasks(this.pageIndex, this.pageSize, this.searchTerm).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data;
+        this.totalElements = response.total;
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to load tasks', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadTasks();
   }
 
   onSearch(): void {
-    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
+    this.pageIndex = 0;
+    this.loadTasks();
   }
 
   openAddTaskDialog(): void {
@@ -118,14 +97,22 @@ export class TaskListComponent implements OnInit {
         this.dataSource.data = [newTask, ...currentData];
         
         // TODO: Add API call to create task
-        console.log('New task added:', newTask);
+        this.loadTasks();
       }
     });
   }
 
-  editTask(task: Task): void {
-    // TODO: Implement edit logic
-    console.log('Editing task:', task);
+  openEditDialog(task: Task): void {
+    const dialogRef = this.dialog.open(EditTaskDialogComponent, {
+      width: '600px',
+      data: task
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadTasks();
+      }
+    });
   }
 
   deleteTask(task: Task): void {

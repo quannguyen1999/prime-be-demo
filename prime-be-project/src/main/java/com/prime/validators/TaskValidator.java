@@ -41,10 +41,13 @@ public class TaskValidator extends CommonValidator {
         checkCondition().accept(ObjectUtils.isEmpty(projectRepository.findById(id).get()), PRODUCT_ID_NOT_FOUND);
     }
 
+    public void validateForListTaskAdmin(Integer page, Integer size) {
+    }
+
     public UserResponse validateCheckUsername(String username) {
         checkEmpty().accept(username, USER_NAME_INVALID);
         UserResponse userResponse = userServiceClient.findUserByUsername(username);
-        checkEmpty().accept(ObjectUtils.isEmpty(userResponse), USER_INVALID);
+        checkCondition().accept(ObjectUtils.isEmpty(userResponse), USER_INVALID);
         return userResponse;
     }
 
@@ -57,7 +60,7 @@ public class TaskValidator extends CommonValidator {
     public UserResponse validateUpdate(TaskRequest taskRequest, UUID taskId) {
         UserResponse userResponse = null;
         checkEmpty().accept(taskRequest, TASK_INVALID);
-        checkEmpty().accept(!ObjectUtils.isEmpty(taskRepository.findById(taskId)), TASK_NOT_EXISTS);
+        checkCondition().accept(ObjectUtils.isEmpty(taskRepository.findById(taskId)), TASK_NOT_EXISTS);
 
         if (StringUtils.hasLength(taskRequest.getTitle())) {
             validateCheckTitle(taskRequest.getTitle());

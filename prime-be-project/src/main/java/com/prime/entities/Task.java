@@ -37,5 +37,4 @@ public class Task extends CommonBaseEntities {
     @JdbcTypeCode(SqlTypes.CHAR)
     private UUID assignedTo;
 
-
 }

@@ -1,6 +1,7 @@
 package com.prime.controllers;
 
 import com.prime.constants.PathApi;
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.TaskRequest;
 import com.prime.models.response.TaskResponse;
 import com.prime.service.TaskService;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.prime.constants.PathApi.GET_TASK_BY_PROJECT;
+import static com.prime.constants.PathApi.GET_TASK_ROOT;
 
 /**
  * REST controller for managing tasks.
@@ -41,10 +45,17 @@ public class TaskController {
      * @param projectId The project Id (zero-based index).
      * @return ResponseEntity with a list of tasks and HTTP 200 status.
      */
-    @GetMapping
-    public ResponseEntity<List<TaskResponse>> getListTaskByProjectId(@RequestParam UUID projectId, @RequestParam Boolean byMe) {
+    @GetMapping(value = GET_TASK_BY_PROJECT)
+    public ResponseEntity<List<TaskResponse>> getAllTaskByProject(UUID projectId, Boolean byMe) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(taskService.listTask(projectId, byMe));
+                .body(taskService.getAllTaskByProject(projectId, byMe));
+    }
+
+
+    @GetMapping(value = GET_TASK_ROOT)
+    public ResponseEntity<CommonPageInfo<TaskResponse>> getTaskRoot(@RequestParam Integer page, @RequestParam Integer size, String nameTask) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.getTaskRoot(page, size, nameTask));
     }
 
     /**
