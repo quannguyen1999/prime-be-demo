@@ -1,91 +1,115 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule, MatSelectChange } from '@angular/material/select';
+import { UserService, User } from '../../../services/user.service';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddUserDialogComponent } from '../add-user-dialog/add-user-dialog.component';
+import { UpdateUserDialogComponent } from '../update-user-dialog/update-user-dialog.component';
 import { SharedModule } from '../../../shared/shared.module';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  status: 'Active' | 'Inactive';
-  createdOn: Date;
-  lastSeen?: Date;
-}
 
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
   standalone: true,
-  imports: [SharedModule]
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    SharedModule
+  ]
 })
 export class UserListComponent implements OnInit {
-  displayedColumns: string[] = ['username', 'email', 'role', 'status', 'createdOn', 'lastSeen', 'actions'];
-  dataSource: MatTableDataSource<User>;
+  displayedColumns: string[] = ['username', 'email', 'role', 'createAt', 'updatedAt', 'actions'];
+  dataSource = new MatTableDataSource<User>([]);
   searchTerm: string = '';
+  total: number = 0;
+  pageSize: number = 5;
+  pageIndex: number = 0;
+  protected readonly Math = Math;
   isExpandedSidebar = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private dialog: MatDialog,
+    private userService: UserService,
     private sidebarService: SidebarService
-  ) {
-    // Sample data - replace with actual API call
-    const users: User[] = [
-      {
-        id: 'c3e1a5a0-5398-4697-bbe6-00c90da7d8b5',
-        username: 'John Doe',
-        email: 'john@example.com',
-        role: 'Admin',
-        status: 'Active',
-        createdOn: new Date('2023-01-01'),
-        lastSeen: new Date('2024-03-15')
-      },
-      {
-        id: 'b4d2b6b1-6499-7798-ccf7-11d91eb8c9c6',
-        username: 'Jane Smith',
-        email: 'jane@example.com',
-        role: 'User',
-        status: 'Active',
-        createdOn: new Date('2023-02-15'),
-        lastSeen: new Date('2024-03-14')
-      },
-      {
-        id: 'a5e3c7c2-7500-8899-ddg8-22e92fc9d0d7',
-        username: 'Bob Wilson',
-        email: 'bob@example.com',
-        role: 'User',
-        status: 'Inactive',
-        createdOn: new Date('2023-03-30'),
-        lastSeen: new Date('2024-02-28')
-      }
-    ];
-    this.dataSource = new MatTableDataSource(users);
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.loadUsers();
     this.sidebarService.isExpanded$.subscribe(
       isExpanded => this.isExpandedSidebar = isExpanded
     );
+  }
 
-    // Add custom filter predicate for search
-    this.dataSource.filterPredicate = (data: User, filter: string) => {
-      const searchStr = filter.toLowerCase();
-      return data.username.toLowerCase().includes(searchStr) ||
-             data.email.toLowerCase().includes(searchStr) ||
-             data.role.toLowerCase().includes(searchStr) ||
-             data.status.toLowerCase().includes(searchStr);
-    };
+  loadUsers(): void {
+    this.userService.getUsers(this.pageIndex, this.pageSize, this.searchTerm).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data;
+        this.total = response.total;
+        this.pageSize = response.size;
+        this.pageIndex = response.page;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+      }
+    });
   }
 
   onSearch(): void {
-    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
+    this.pageIndex = 0;
+    this.loadUsers();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadUsers();
+  }
+
+  onPageSizeChange(event: MatSelectChange): void {
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.loadUsers();
+  }
+
+  getRoleBadgeClass(role: string): string {
+    switch (role) {
+      case 'ADMIN':
+        return 'bg-purple-100 text-purple-800';
+      case 'USER':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  formatDate(date: string): string {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   }
 
   openAddUserDialog(): void {
@@ -97,30 +121,31 @@ export class UserListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Generate a random UUID for the new user
-        const newUser: User = {
-          id: crypto.randomUUID(),
-          ...result,
-          lastSeen: new Date()
-        };
-        
-        // Add the new user to the table
-        const currentData = this.dataSource.data;
-        this.dataSource.data = [newUser, ...currentData];
-        
-        // TODO: Add API call to create user
-        console.log('New user added:', newUser);
+        this.loadUsers();
+      }
+    });
+  }
+
+  openUpdateUserDialog(user: User): void {
+    const dialogRef = this.dialog.open(UpdateUserDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      panelClass: 'custom-dialog-container',
+      data: user
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadUsers();
       }
     });
   }
 
   editUser(user: User): void {
-    // TODO: Implement edit logic
-    console.log('Editing user:', user);
+    console.log('Edit user:', user);
   }
 
   deleteUser(user: User): void {
-    // TODO: Implement delete logic
-    console.log('Deleting user:', user);
+    console.log('Delete user:', user);
   }
 }

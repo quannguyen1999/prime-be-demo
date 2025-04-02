@@ -49,9 +49,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -109,8 +106,6 @@ public class SecurityConfig {
                 .apply(authorizationServerConfigurer);
 
         return http
-                .cors()
-                .and()
                 .csrf(AbstractHttpConfigurer::disable)
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .tokenEndpoint(tokenEndpoint -> tokenEndpoint
@@ -131,6 +126,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(ALLOW_REQUEST.toArray(new String[0])).permitAll()
                         .requestMatchers(PROJECT.concat(FULL_PATH)).hasAuthority(ADMIN.toString())
@@ -283,19 +279,19 @@ public class SecurityConfig {
         };
     }
 
-    //Set CORS
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-        // Allow all origins, methods, and headers. This is just an example.
-        config.addAllowedOrigin("*");
-        config.addAllowedMethod("*");
-        config.addAllowedHeader("*");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
+//    //Set CORS
+//    @Bean
+//    public CorsFilter corsFilter() {
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        CorsConfiguration config = new CorsConfiguration();
+//
+//        // Allow all origins, methods, and headers. This is just an example.
+//        config.addAllowedOrigin("*");
+//        config.addAllowedMethod("*");
+//        config.addAllowedHeader("*");
+//        source.registerCorsConfiguration("/**", config);
+//        return new CorsFilter(source);
+//    }
 
 
     //Set timeout session

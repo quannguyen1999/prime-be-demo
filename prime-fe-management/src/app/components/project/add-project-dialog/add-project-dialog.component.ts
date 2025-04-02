@@ -9,6 +9,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ProjectService } from '../../../services/project.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-add-project-dialog',
@@ -38,10 +41,13 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class AddProjectDialogComponent {
   projectForm: FormGroup;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AddProjectDialogComponent>
+    private dialogRef: MatDialogRef<AddProjectDialogComponent>,
+    private projectService: ProjectService,
+    private snackBar: MatSnackBar
   ) {
     this.projectForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -51,7 +57,25 @@ export class AddProjectDialogComponent {
 
   onSubmit(): void {
     if (this.projectForm.valid) {
-      this.dialogRef.close(this.projectForm.value);
+      this.isLoading = true;
+      this.projectService.createProject(this.projectForm.value)
+        .pipe(
+          finalize(() => this.isLoading = false)
+        )
+        .subscribe({
+          next: (project) => {
+            this.snackBar.open('Project created successfully', 'Close', { duration: 3000 });
+            this.dialogRef.close(true);
+          },
+          error: (error) => {
+            let errorMessage = 'Failed to create project';
+            if (error.message === 'Invalid project name') {
+              errorMessage = 'Invalid project name';
+              this.projectForm.get('name')?.setErrors({ invalid: true });
+            }
+            this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+          }
+        });
     }
   }
 

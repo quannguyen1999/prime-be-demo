@@ -2,6 +2,7 @@ package com.prime.service.impl;
 
 import com.prime.entities.Project;
 import com.prime.feignClient.UserServiceClient;
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.ProjectRequest;
 import com.prime.models.response.ProjectResponse;
 import com.prime.repositories.ProjectRepository;
@@ -9,12 +10,12 @@ import com.prime.service.ProjectService;
 import com.prime.utils.SecurityUtil;
 import com.prime.validators.ProjectValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,14 +47,22 @@ public class ProjectImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponse> listProject(Integer page, Integer size) {
+    public CommonPageInfo<ProjectResponse> listProject(Integer page, Integer size, String name) {
         //Validate The list project
         projectValidator.validateGetList(page, size);
-        List<ProjectResponse> projectResponses = projectRepository.findAll(PageRequest.of(page, size)).stream().map(MAPPER::projectToProjectResponse).toList();
-        Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(projectResponses.stream().map(ProjectResponse::getOwnerId).collect(Collectors.toList()));
-        projectResponses.parallelStream().forEach(project -> {
-            if (getListUserNames.containsKey(project.getOwnerId())) {
-                project.setOwnerUsername(getListUserNames.get(project.getOwnerId()));
+        Page<Project> projects = StringUtils.hasLength(name) ? projectRepository.searchProjects(name, PageRequest.of(page, size)) :
+                projectRepository.findAll(PageRequest.of(page, size));
+        CommonPageInfo<ProjectResponse> projectResponses = CommonPageInfo.<ProjectResponse>builder()
+                .total(projects.getTotalElements())
+                .page(projects.getNumber())
+                .size(projects.getSize())
+                .data(projects.getContent().stream().map(MAPPER::projectToProjectResponse).collect(Collectors.toList()))
+                .build();
+
+        Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(projects.getContent().stream().map(Project::getOwnerId).collect(Collectors.toList()));
+        projectResponses.getData().parallelStream().forEach(projectResponse -> {
+            if (getListUserNames.containsKey(projectResponse.getOwnerId())) {
+                projectResponse.setOwnerUsername(getListUserNames.get(projectResponse.getOwnerId()));
             }
         });
         return projectResponses;

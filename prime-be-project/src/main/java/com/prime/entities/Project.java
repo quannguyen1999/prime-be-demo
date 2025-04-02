@@ -14,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@ToString
 public class Project extends CommonBaseEntities{
 
     @Id

@@ -1,6 +1,8 @@
 package com.prime.repositories;
 
 import com.prime.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +19,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u.id, u.username FROM User u WHERE u.id IN :uuids")
     List<Object[]> findUserIdAndUsernameByIds(@Param("uuids") List<UUID> uuids);
+
+    @Query("SELECT p FROM User p WHERE " +
+            "LOWER(p.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<User> searchUsers(@Param("keyword") String keyword, PageRequest pageRequest);
 
     User findUserByUsername(String username);
 

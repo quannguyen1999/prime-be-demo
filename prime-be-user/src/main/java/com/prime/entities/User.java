@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class User {
+public class User extends CommonBaseEntities {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "char(36)")

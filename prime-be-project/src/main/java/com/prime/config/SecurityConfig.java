@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
@@ -27,6 +27,7 @@ import static com.prime.constants.UserRole.USER;
  * - Defines access control for different API endpoints.
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     public static final String JWT_ROLE_NAME = "authorities"; // Defines the JWT claim name for roles
@@ -54,7 +55,9 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         // Allow all requests to the specified public endpoints
                         .requestMatchers(ALLOW_REQUEST.toArray(new String[0])).permitAll()
@@ -67,15 +70,27 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .decoder(JwtDecoders.fromIssuerLocation(issuerUri)) // Decode JWT using issuer URI
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter()) // Convert JWT to Spring Security authentication
+                                .decoder(JwtDecoders.fromIssuerLocation(issuerUri))
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection (consider enabling if needed)
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // Disable X-Frame-Options (useful for embedded frames)
-
-        return http.build();
+                .build();
     }
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Frontend URL
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+//        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Response-Time"));
+//        configuration.setAllowCredentials(true); // Enable credentials since we're using token-based auth
+//        configuration.setMaxAge(3600L);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
     /**
      * Provides a password encoder bean using BCrypt.

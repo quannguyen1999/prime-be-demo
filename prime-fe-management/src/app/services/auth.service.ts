@@ -22,6 +22,8 @@ interface RegisterResponse {
   providedIn: 'root'
 })
 export class AuthService {
+  private apiUrl = `${environment.apiUrl}/auth-service`;
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -30,7 +32,7 @@ export class AuthService {
 
   register(username: string, email: string, password: string): Observable<RegisterResponse> {  
   // return this.http.post<LoginResponse>(API_CONFIG.auth.tokenUrl, null, { params }).pipe(
-    return this.http.post<RegisterResponse>(`${environment.userServiceUrl}/users`, {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, {
       username,
       email,
       password,
@@ -103,5 +105,9 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('access_token');
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
   }
 } 

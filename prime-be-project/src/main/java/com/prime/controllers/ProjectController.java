@@ -1,6 +1,7 @@
 package com.prime.controllers;
 
 import com.prime.constants.PathApi;
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.ProjectRequest;
 import com.prime.models.response.ProjectResponse;
 import com.prime.service.ProjectService;
@@ -9,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -43,9 +43,9 @@ public class ProjectController {
      * @return ResponseEntity with a list of projects and HTTP 200 status.
      */
     @GetMapping
-    public ResponseEntity<List<ProjectResponse>> getListProject(@RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<CommonPageInfo<ProjectResponse>> getListProject(@RequestParam Integer page, @RequestParam Integer size, String name) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(projectService.listProject(page, size));
+                .body(projectService.listProject(page, size, name));
     }
 
     /**

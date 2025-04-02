@@ -2,6 +2,7 @@ package com.prime.service.impl;
 
 import com.prime.constants.UserRole;
 import com.prime.entities.User;
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.UserRequest;
 import com.prime.models.response.UserResponse;
 import com.prime.repositories.UserRepository;
@@ -9,6 +10,7 @@ import com.prime.service.UserService;
 import com.prime.utils.SecurityUtil;
 import com.prime.validators.UserValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ import static com.prime.mappers.UserMapper.MAPPER;
 @Service
 public class UserImpl implements UserService {
 
+    private static final String DEFAULT_PASS = "123456";
+
     private final UserRepository userRepository;
 
     private final UserValidator userValidator;
@@ -36,21 +40,28 @@ public class UserImpl implements UserService {
     public UserResponse createUser(UserRequest userRequest) {
         //Validate create user
         userValidator.validateCreate(userRequest);
-        userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        if (!ObjectUtils.isEmpty(SecurityUtil.getDetails()) && SecurityUtil.isAdmin()) {
+            userRequest.setPassword(passwordEncoder.encode(DEFAULT_PASS));
+        } else {
+            userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        }
         userRequest.setRole(UserRole.USER);
         User user = userRepository.save(MAPPER.userRequestToUser(userRequest));
         return MAPPER.userToUserResponse(user);
     }
 
     @Override
-    public List<UserResponse> listUser(Integer page, Integer size) {
+    public CommonPageInfo<UserResponse> listUser(Integer page, Integer size, String username) {
         //Validate list user
         userValidator.validateGetList(page, size);
-
-        return userRepository.findAll(PageRequest.of(page, size))
-                .stream()
-                .map(MAPPER::userToUserResponse)
-                .collect(Collectors.toList());
+        Page<User> user = StringUtils.hasLength(username) ? userRepository.searchUsers(username, PageRequest.of(page, size)) :
+                userRepository.findAll(PageRequest.of(page, size));
+        return CommonPageInfo.<UserResponse>builder()
+                .total(user.getTotalElements())
+                .page(user.getNumber())
+                .size(user.getSize())
+                .data(user.getContent().stream().map(MAPPER::userToUserResponse).collect(Collectors.toList()))
+                .build();
     }
 
     @Override

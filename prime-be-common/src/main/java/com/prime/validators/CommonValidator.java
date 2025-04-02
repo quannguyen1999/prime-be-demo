@@ -22,7 +22,7 @@ import static com.prime.constants.MessageErrors.SIZE_INVALID;
  */
 class CommonValidator {
 
-    private static final Integer MAX_SIZE_PAGE = 10;
+    private static final Integer MAX_SIZE_PAGE = 30;
 
     /**
      * Regular expression for validating email format

@@ -1,5 +1,6 @@
 package com.prime.service;
 
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.UserRequest;
 import com.prime.models.response.UserResponse;
 
@@ -11,7 +12,7 @@ public interface UserService {
 
     UserResponse createUser(UserRequest userRequest);
 
-    List<UserResponse> listUser(Integer page, Integer size);
+    CommonPageInfo<UserResponse> listUser(Integer page, Integer size, String username);
 
     UserResponse updateUser(UserRequest userRequest);
 

@@ -43,8 +43,8 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="bg-white text-xs font-medium text-gray-500 px-6 py-3 border-b">STATUS</th>
         <td mat-cell *matCellDef="let project" class="px-6 py-4">
-          <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            In Progress
+          <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusColor(project.status || 'In Progress')">
+            {{project.status || 'In Progress'}}
           </span>
         </td>
       </ng-container>
@@ -111,17 +111,17 @@
 
       <div class="flex items-center gap-4">
         <span class="text-sm text-gray-600">
-          {{totalElements === 0 ? '0 of 0' : (pageIndex * pageSize) + 1 + ' - ' + Math.min((pageIndex + 1) * pageSize, totalElements) + ' of ' + totalElements}}
+          {{total === 0 ? '0 of 0' : (pageIndex * pageSize) + 1 + ' - ' + Math.min((pageIndex + 1) * pageSize, total) + ' of ' + total}}
         </span>
         <div class="flex gap-2">
           <button mat-icon-button 
                   [disabled]="pageIndex === 0"
-                  (click)="onPageChange({pageIndex: pageIndex - 1, pageSize: pageSize, length: totalElements})">
+                  (click)="onPageChange({pageIndex: pageIndex - 1, pageSize: pageSize, length: total})">
             <mat-icon>chevron_left</mat-icon>
           </button>
           <button mat-icon-button 
-                  [disabled]="(pageIndex + 1) * pageSize >= totalElements"
-                  (click)="onPageChange({pageIndex: pageIndex + 1, pageSize: pageSize, length: totalElements})">
+                  [disabled]="(pageIndex + 1) * pageSize >= total"
+                  (click)="onPageChange({pageIndex: pageIndex + 1, pageSize: pageSize, length: total})">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>

@@ -1,34 +1,42 @@
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-semibold">Add New Project</h2>
+        <h2 class="text-xl font-medium text-gray-900">Create New Project</h2>
         <button mat-icon-button (click)="onClose()">
             <mat-icon>close</mat-icon>
         </button>
     </div>
 
     <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
-        <!-- Name -->
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <input matInput formControlName="name" placeholder="Project Name *">
-            <mat-error *ngIf="projectForm.get('name')?.hasError('required')">
-                Project name is required
-            </mat-error>
-        </mat-form-field>
+        <div class="space-y-4">
+            <mat-form-field appearance="outline" class="w-full">
+             
+                <input matInput formControlName="name" placeholder="Enter project name">
+                <mat-error *ngIf="projectForm.get('name')?.errors?.['required']">
+                    Project name is required
+                </mat-error>
+                <mat-error *ngIf="projectForm.get('name')?.errors?.['invalid']">
+                    Invalid project name
+                </mat-error>
+            </mat-form-field>
 
-        <!-- Description -->
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <textarea matInput 
-                      formControlName="description" 
-                      placeholder="Project Description *"
-                      rows="4"></textarea>
-            <mat-error *ngIf="projectForm.get('description')?.hasError('required')">
-                Project description is required
-            </mat-error>
-        </mat-form-field>
+            <mat-form-field appearance="outline" class="w-full">
+               
+                <textarea matInput formControlName="description" placeholder="Enter project description" rows="4"></textarea>
+                <mat-error *ngIf="projectForm.get('description')?.errors?.['required']">
+                    Description is required
+                </mat-error>
+            </mat-form-field>
+        </div>
 
-        <div class="flex justify-end mt-6">
-            <button mat-button type="button" (click)="onClose()" class="mr-2">Cancel</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="projectForm.invalid">
+        <div class="flex justify-end gap-3 mt-6">
+            <button mat-button type="button" (click)="onClose()">
+                Cancel
+            </button>
+            <button mat-flat-button 
+                    color="primary" 
+                    type="submit" 
+                    [disabled]="projectForm.invalid || isLoading">
+                <mat-icon *ngIf="isLoading" class="animate-spin mr-2">refresh</mat-icon>
                 Create Project
             </button>
         </div>

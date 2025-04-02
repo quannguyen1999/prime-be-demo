@@ -16,7 +16,7 @@ spring:
     schemas: ${spring.datasource.schema}  # Schema for migrations
     user: ${spring.datasource.username}  # Flyway migration user
     password: ${spring.datasource.password}  # Flyway migration password
-    enabled: false  # Disable Flyway migrations
+    enabled: true  # Disable Flyway migrations
     validate-migration-naming: true  # Enforce naming validation for migrations
 
 # Application Information

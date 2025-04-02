@@ -6,6 +6,9 @@ import { Router } from '@angular/router';
 import { SidebarService } from '../../../services/sidebar.service';
 import { ProjectService, Project } from '../../../services/project.service';
 import { AddProjectDialogComponent } from '../add-project-dialog/add-project-dialog.component';
+import { EditProjectDialogComponent } from '../edit-project-dialog/edit-project-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
@@ -41,7 +44,7 @@ export class ProjectListComponent implements OnInit {
   dataSource: MatTableDataSource<Project> = new MatTableDataSource<Project>([]);
   searchTerm: string = '';
   isExpandedSidebar = false;
-  totalElements = 0;
+  total = 0;
   pageSize = 5;
   pageIndex = 0;
   protected readonly Math = Math;
@@ -52,7 +55,8 @@ export class ProjectListComponent implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private sidebarService: SidebarService,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -63,13 +67,13 @@ export class ProjectListComponent implements OnInit {
   }
 
   loadProjects(): void {
-    this.projectService.getProjects(this.pageIndex, this.pageSize)
+    this.projectService.getProjects(this.pageIndex, this.pageSize, this.searchTerm)
       .subscribe({
         next: (response) => {
-          this.dataSource.data = response.content;
-          this.totalElements = response.totalElements;
+          this.dataSource.data = response.data;
+          this.total = response.total;
           this.pageSize = response.size;
-          this.pageIndex = response.number;
+          this.pageIndex = response.page;
         },
         error: (error) => {
           console.error('Error loading projects:', error);
@@ -113,11 +117,49 @@ export class ProjectListComponent implements OnInit {
   }
 
   editProject(project: Project): void {
-    console.log('Editing project:', project);
+    const dialogRef = this.dialog.open(EditProjectDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      panelClass: 'custom-dialog-container',
+      data: { project }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadProjects();
+      }
+    });
   }
 
   deleteProject(project: Project): void {
-    console.log('Deleting project:', project);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Project',
+        message: `Are you sure you want to delete project "${project.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.projectService.deleteProject(project.id).subscribe({
+          next: (response) => {
+            this.snackBar.open(response.message, 'Close', { duration: 3000 });
+            this.loadProjects();
+          },
+          error: (error) => {
+            console.log(error)
+            let errorMessage = 'Failed to delete project';
+            if (error.message === 'Invalid project') {
+              errorMessage = 'Project not found or already deleted';
+            }
+            this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   getStatusColor(status: string): string {

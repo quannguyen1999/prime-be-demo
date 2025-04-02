@@ -1,6 +1,7 @@
 package com.prime.controllers;
 
 import com.prime.constants.PathApi;
+import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.UserRequest;
 import com.prime.models.response.UserResponse;
 import com.prime.service.UserService;
@@ -29,8 +30,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getListUser(@RequestParam Integer page, @RequestParam Integer size) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.listUser(page, size));
+    public ResponseEntity<CommonPageInfo<UserResponse>> getListUser(@RequestParam Integer page, @RequestParam Integer size, String username) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.listUser(page, size, username));
     }
 
     @PutMapping
