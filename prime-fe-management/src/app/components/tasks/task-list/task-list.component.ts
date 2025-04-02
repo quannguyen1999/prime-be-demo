@@ -11,6 +11,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { SidebarService } from '../../../services/sidebar.service';
 import { AddTaskDialogComponent } from '../add-task-dialog/add-task-dialog.component';
 import { EditTaskDialogComponent } from '../edit-task-dialog/edit-task-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-task-list',
@@ -25,7 +26,16 @@ import { EditTaskDialogComponent } from '../edit-task-dialog/edit-task-dialog.co
   ]
 })
 export class TaskListComponent implements OnInit {
-  displayedColumns: string[] = ['title', 'description', 'status', 'assignedTo', 'createAt', 'updatedAt', 'actions'];
+  displayedColumns: string[] = [
+    'title',
+    'projectName',
+    'description',
+    'status',
+    'assignedTo',
+    'createAt',
+    'updatedAt',
+    'actions'
+  ];
   dataSource: MatTableDataSource<Task>;
   searchTerm: string = '';
   pageSize: number = 5;
@@ -116,7 +126,32 @@ export class TaskListComponent implements OnInit {
   }
 
   deleteTask(task: Task): void {
-    // TODO: Implement delete logic
-    console.log('Deleting task:', task);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Task',
+        message: `Are you sure you want to delete task "${task.title}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.taskService.deleteTask(task.id).subscribe({
+          next: (response) => {
+            this.snackBar.open(response.message, 'Close', { duration: 3000 });
+            this.loadTasks();
+          },
+          error: (error) => {
+            let errorMessage = 'Failed to delete task';
+            if (error.message === 'Task not found') {
+              errorMessage = 'Task no longer exists';
+            }
+            this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

@@ -22,9 +22,9 @@ public class Task extends CommonBaseEntities {
     @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
-    @Column(columnDefinition = "char(36)")
-    @JdbcTypeCode(SqlTypes.CHAR)
-    private UUID projectId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     private String title;
 

@@ -1,6 +1,7 @@
 package com.prime.service.impl;
 
 import com.prime.constants.TaskStatus;
+import com.prime.entities.Project;
 import com.prime.entities.Task;
 import com.prime.feignClient.UserServiceClient;
 import com.prime.mappers.TaskMapper;
@@ -8,6 +9,7 @@ import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.TaskRequest;
 import com.prime.models.response.TaskResponse;
 import com.prime.models.response.UserResponse;
+import com.prime.repositories.ProjectRepository;
 import com.prime.repositories.TaskRepository;
 import com.prime.service.TaskService;
 import com.prime.utils.SecurityUtil;
@@ -33,6 +35,8 @@ public class TaskImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
+    private final ProjectRepository projectRepository;
+
     private final TaskValidator taskValidator;
 
     private final UserServiceClient userServiceClient;
@@ -44,6 +48,10 @@ public class TaskImpl implements TaskService {
         Task task = MAPPER.taskRequestToTask(taskRequest);
         task.setAssignedTo(userAssigned.getId());
         task.setStatus(TaskStatus.BACK_LOG);
+
+        Project project = projectRepository.findById(taskRequest.getProjectId()).get();
+        task.setProject(project);
+
         Task taskInsert = taskRepository.save(task);
         TaskResponse taskResponse = MAPPER.taskToTaskResponse(taskInsert);
         taskResponse.setUserName(taskRequest.getAssignedTo());
@@ -80,7 +88,6 @@ public class TaskImpl implements TaskService {
                 .size(tasks.getSize())
                 .data(tasks.getContent().stream().map(MAPPER::taskToTaskResponse).collect(Collectors.toList()))
                 .build();
-
 
         Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(tasks.getContent().stream().map(Task::getAssignedTo).collect(Collectors.toList()));
         taskResponse.getData().parallelStream().forEach(taskResponse1 -> {
