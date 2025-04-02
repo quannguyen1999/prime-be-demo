@@ -1,36 +1,41 @@
 package com.prime.entities;
 
-import com.prime.constants.ActivityAction;
+import com.prime.constants.ActivityType;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
-import java.util.UUID;
+import java.util.Date;
 
 @Entity
-@Table(name = "ActivityLog")
+@Table(name = "activity_log")
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Builder
 public class ActivityLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "char(36)")
-    @JdbcTypeCode(SqlTypes.CHAR)
-    private UUID id;
+    @Column(name = "id", length = 36)
+    private String id;
 
-    private UUID userId;
+    @Column(name = "user_id", length = 36, nullable = false)
+    private String userId;
 
-    private UUID projectId;
+    @Column(name = "project_id", length = 36, nullable = false)
+    private String projectId;
 
     @Enumerated(EnumType.STRING)
-    private ActivityAction action;
+    @Column(name = "action", nullable = false)
+    private ActivityType action;
 
-    private LocalTime timestamp;
-    
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "timestamp", nullable = false)
+    private Date timestamp;
 
+    @PrePersist
+    protected void onCreate() {
+        timestamp = new Date();
+    }
 }

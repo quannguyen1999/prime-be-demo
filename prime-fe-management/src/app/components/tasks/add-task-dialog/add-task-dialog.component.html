@@ -10,7 +10,7 @@
         <div class="space-y-4">
             <!-- Title Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Task Title</mat-label>
+              
                 <input matInput formControlName="title" placeholder="Enter task title" required>
                 <mat-error *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched">
                     Task title is required
@@ -19,14 +19,14 @@
 
             <!-- Project Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Project</mat-label>
+              
                 <input type="text"
                        matInput
                        formControlName="projectId"
                        [matAutocomplete]="auto"
-                       [readonly]="data.disableProject"
-                       [placeholder]="data.disableProject ? '' : 'Search for a project'"
-                       [value]="data.preselectedProject?.name || ''">
+                       [readonly]="data?.disableProject ?? false"
+                       [placeholder]="(data?.disableProject ?? false) ? '' : 'Search for a project'"
+                       [value]="data?.preselectedProject?.name || ''">
                 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProjectFn">
                     <mat-option *ngFor="let project of (filteredProjects | async)?.data" [value]="project">
                         {{project.name}}
@@ -39,7 +39,7 @@
 
             <!-- Description Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Description</mat-label>
+              
                 <textarea matInput formControlName="description" placeholder="Enter task description" rows="4" required></textarea>
                 <mat-error *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched">
                     Description is required
@@ -48,7 +48,7 @@
 
             <!-- Status Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Status</mat-label>
+                
                 <mat-select formControlName="status" required>
                     <mat-option value="BACK_LOG">Backlog</mat-option>
                     <mat-option value="DOING">Doing</mat-option>
@@ -63,7 +63,7 @@
 
             <!-- Assigned To Field -->
             <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Assigned To</mat-label>
+               
                 <input type="text"
                        matInput
                        formControlName="assignedTo"

@@ -1,8 +1,11 @@
 package com.prime.service.impl;
 
+import com.prime.annotations.Audited;
+import com.prime.constants.ActivityType;
 import com.prime.constants.TaskStatus;
 import com.prime.entities.Project;
 import com.prime.entities.Task;
+import com.prime.exceptions.ResourceNotFoundException;
 import com.prime.feignClient.UserServiceClient;
 import com.prime.mappers.TaskMapper;
 import com.prime.models.request.CommonPageInfo;
@@ -41,6 +44,7 @@ public class TaskImpl implements TaskService {
     private final UserServiceClient userServiceClient;
 
     @Override
+    @Audited(activityType = ActivityType.TASK_CREATED, entityType = "TASK")
     public TaskResponse createTask(TaskRequest taskRequest) {
         //Validate Create task
         UserResponse userAssigned = taskValidator.validateCreate(taskRequest);
@@ -107,6 +111,7 @@ public class TaskImpl implements TaskService {
     }
 
     @Override
+    @Audited(activityType = ActivityType.TASK_DELETED, entityType = "TASK")
     public void deleteTask(UUID taskId) {
         //Validate the delete task
         taskValidator.validateDeleteTask(taskId);
@@ -114,6 +119,7 @@ public class TaskImpl implements TaskService {
     }
 
     @Override
+    @Audited(activityType = ActivityType.TASK_UPDATED, entityType = "TASK")
     public TaskResponse updateTask(TaskRequest taskRequest, UUID taskId) {
         //Validate the delete task
         UserResponse userResponse = taskValidator.validateUpdate(taskRequest, taskId);
@@ -130,6 +136,26 @@ public class TaskImpl implements TaskService {
         if (SecurityUtil.isAdmin()) {
             task.setAssignedTo(userResponse.getId());
         }
+        task = taskRepository.save(task);
+        return TaskMapper.MAPPER.taskToTaskResponse(task);
+    }
+
+    @Override
+    @Audited(activityType = ActivityType.TASK_STATUS_CHANGED, entityType = "TASK")
+    public TaskResponse updateTaskStatus(UUID id, TaskStatus status) {
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+        task.setStatus(status);
+        task = taskRepository.save(task);
+        return TaskMapper.MAPPER.taskToTaskResponse(task);
+    }
+
+    @Override
+    @Audited(activityType = ActivityType.TASK_ASSIGNED, entityType = "TASK")
+    public TaskResponse assignTask(UUID id, UUID userId) {
+        Task task = taskRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+        task.setAssignedTo(userId);
         task = taskRepository.save(task);
         return TaskMapper.MAPPER.taskToTaskResponse(task);
     }

@@ -4,7 +4,7 @@ import { curveLinear } from 'd3-shape';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { ProjectService, ProjectStatistics, ProjectSummary, OverallStatistics, StatusBreakdown } from '../../services/project.service';
+import { ProjectService, ProjectStatistics, ProjectSummary, OverallStatistics, ActivityLog, ActivityLogResponse } from '../../services/project.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FindPipe } from '../../shared/pipes/find.pipe';
 
@@ -16,14 +16,6 @@ interface ProjectCard {
   daysLeft: number;
   date: string;
   team: { id: string; avatar?: string; name: string }[];
-}
-
-interface ActivityLog {
-  id: string;
-  username: string;
-  project: string;
-  status: 'Created' | 'Updated' | 'Completed' | 'Deleted';
-  timestamp: Date;
 }
 
 @Component({
@@ -207,43 +199,7 @@ export class DashboardComponent implements OnInit {
 
   viewType: 'grid' | 'list' = 'grid';
 
-  activityLogs: ActivityLog[] = [
-    {
-      id: 'ACT001',
-      username: 'John Doe',
-      project: 'Web Designing',
-      status: 'Created',
-      timestamp: new Date('2024-03-31T10:30:00')
-    },
-    {
-      id: 'ACT002',
-      username: 'Jane Smith',
-      project: 'Testing',
-      status: 'Updated',
-      timestamp: new Date('2024-03-31T09:45:00')
-    },
-    {
-      id: 'ACT003',
-      username: 'Alice Johnson',
-      project: 'Svg Animations',
-      status: 'Completed',
-      timestamp: new Date('2024-03-31T09:15:00')
-    },
-    {
-      id: 'ACT004',
-      username: 'Bob Wilson',
-      project: 'UI Development',
-      status: 'Updated',
-      timestamp: new Date('2024-03-31T08:30:00')
-    },
-    {
-      id: 'ACT005',
-      username: 'Charlie Brown',
-      project: 'Data Analysis',
-      status: 'Created',
-      timestamp: new Date('2024-03-31T08:00:00')
-    }
-  ];
+  activityLogs: ActivityLog[] = [];
 
   constructor(
     private router: Router,
@@ -254,6 +210,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadStatistics();
     this.loadOverallStatistics();
+    this.loadActivityLogs();
   }
 
   loadStatistics(): void {
@@ -276,6 +233,17 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         this.snackBar.open('Failed to load overall statistics', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  loadActivityLogs(): void {
+    this.projectService.getActivityLogs().subscribe({
+      next: (response) => {
+        this.activityLogs = response.data;
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to load activity logs', 'Close', { duration: 3000 });
       }
     });
   }
@@ -360,13 +328,21 @@ export class DashboardComponent implements OnInit {
     console.log('Item clicked', event);
   }
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'Created': return 'bg-green-100 text-green-800';
-      case 'Updated': return 'bg-blue-100 text-blue-800';
-      case 'Completed': return 'bg-purple-100 text-purple-800';
-      case 'Deleted': return 'bg-red-100 text-red-800';
+  getStatusColor(action: string): string {
+    switch (action) {
+      case 'TASK_CREATED': return 'bg-green-100 text-green-800';
+      case 'TASK_UPDATED': return 'bg-blue-100 text-blue-800';
+      case 'TASK_DELETED': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  formatAction(action: string): string {
+    switch (action) {
+      case 'TASK_CREATED': return 'Created';
+      case 'TASK_UPDATED': return 'Updated';
+      case 'TASK_DELETED': return 'Deleted';
+      default: return action;
     }
   }
 

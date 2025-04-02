@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.prime.mappers.ProjectMapper.MAPPER;
+import com.prime.annotations.Audited;
+import com.prime.constants.ActivityType;
 
 @AllArgsConstructor
 @Service
@@ -35,6 +37,7 @@ public class ProjectImpl implements ProjectService {
     private final UserServiceClient userServiceClient;
 
     @Override
+    @Audited(activityType = ActivityType.PROJECT_CREATED, entityType = "PROJECT")
     public ProjectResponse createProject(ProjectRequest projectRequest) {
         projectValidator.validateCreate(projectRequest);
         Project project = MAPPER.projectRequestToProject(projectRequest);
@@ -64,12 +67,14 @@ public class ProjectImpl implements ProjectService {
     }
 
     @Override
+    @Audited(activityType = ActivityType.PROJECT_DELETED, entityType = "PROJECT")
     public void deleteProject(UUID projectId) {
         projectValidator.validateDelete(projectId);
         projectRepository.deleteById(projectId);
     }
 
     @Override
+    @Audited(activityType = ActivityType.PROJECT_UPDATED, entityType = "PROJECT")
     public ProjectResponse updateProject(ProjectRequest projectRequest, UUID projectId) {
         projectValidator.validateUpdate(projectRequest, projectId);
         Project project = projectRepository.findById(projectId).get();

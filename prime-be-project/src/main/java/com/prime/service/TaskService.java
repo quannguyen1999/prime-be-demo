@@ -1,5 +1,6 @@
 package com.prime.service;
 
+import com.prime.constants.TaskStatus;
 import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.TaskRequest;
 import com.prime.models.response.TaskResponse;
@@ -18,5 +19,9 @@ public interface TaskService {
     void deleteTask(UUID taskId);
 
     TaskResponse updateTask(TaskRequest taskRequest, UUID taskId);
+
+    TaskResponse updateTaskStatus(UUID id, TaskStatus status);
+
+    TaskResponse assignTask(UUID id, UUID userId);
 
 }

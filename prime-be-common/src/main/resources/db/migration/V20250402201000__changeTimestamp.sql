@@ -1,0 +1,2 @@
+ALTER TABLE `activity_log`
+MODIFY COLUMN `timestamp` DATETIME NOT NULL;

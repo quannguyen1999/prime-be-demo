@@ -50,23 +50,32 @@ export class AddTaskDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddTaskDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: AddTaskDialogData,
+    @Inject(MAT_DIALOG_DATA) public data: AddTaskDialogData = {},
     private projectService: ProjectService,
     private userService: UserService,
     private taskService: TaskService,
     private snackBar: MatSnackBar
   ) {
+    // Initialize form with safe defaults
     this.taskForm = this.fb.group({
-      title: ['', Validators.required],
-      projectId: [data.preselectedProject || '', Validators.required],
-      description: ['', Validators.required],
+      title: ['', [Validators.required]],
+      description: [''],
+      projectId: [null, Validators.required],
+      assignedTo: [''],
       status: ['BACK_LOG', Validators.required],
-      assignedTo: ['', Validators.required]
+      dueDate: [null]
     });
 
-    // If project is pre-selected and should be disabled
-    if (data.preselectedProject && data.disableProject) {
-      this.taskForm.get('projectId')?.disable();
+    // If project is pre-selected, update the form
+    if (this.data && this.data.preselectedProject) {
+      this.taskForm.patchValue({
+        projectId: this.data.preselectedProject.id
+      });
+
+      // If project should be disabled
+      if (this.data.disableProject) {
+        this.taskForm.get('projectId')?.disable();
+      }
     }
 
     // Setup project search with autocomplete
@@ -105,8 +114,14 @@ export class AddTaskDialogComponent implements OnInit {
       this.isLoading = true;
       const formValue = this.taskForm.value;
       
-      // Use preselectedProject.id if available, otherwise use the selected project's id
-      const projectId = this.data.preselectedProject?.id || formValue.projectId?.id;
+      // Get projectId from either preselected project or form value
+      const projectId = this.data?.preselectedProject?.id || formValue.projectId?.id;
+
+      if (!projectId) {
+        this.snackBar.open('Project is required', 'Close', { duration: 3000 });
+        this.isLoading = false;
+        return;
+      }
 
       const taskData = {
         title: formValue.title,

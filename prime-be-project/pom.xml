@@ -102,6 +102,13 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <version>4.1.0</version>
         </dependency>
+
+        <!-- Hibernate5 Jackson module -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
+            <version>2.15.2</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

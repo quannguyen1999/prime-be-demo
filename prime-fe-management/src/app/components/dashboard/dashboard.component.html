@@ -76,22 +76,27 @@
                             <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">ID</th>
                             <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">User</th>
                             <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Project</th>
-                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Status</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Action</th>
                             <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Time</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <tr *ngFor="let log of activityLogs" class="hover:bg-gray-50">
-                            <td class="py-3 text-sm text-gray-900">{{log.id}}</td>
+                            <td class="py-3 text-sm text-gray-900 font-mono">{{log.id.substring(0, 8)}}</td>
                             <td class="py-3 text-sm text-gray-900">{{log.username}}</td>
-                            <td class="py-3 text-sm text-gray-900">{{log.project}}</td>
+                            <td class="py-3 text-sm text-gray-900 truncate max-w-[200px]">{{log.projectName}}</td>
                             <td class="py-3">
-                                <span [class]="getStatusColor(log.status)"
-                                      class="px-2 py-1 text-xs rounded-full">
-                                    {{log.status}}
+                                <span [class]="getStatusColor(log.action)"
+                                      class="px-2 py-1 text-xs rounded-full whitespace-nowrap">
+                                    {{formatAction(log.action)}}
                                 </span>
                             </td>
                             <td class="py-3 text-sm text-gray-500">{{log.timestamp | date:'HH:mm'}}</td>
+                        </tr>
+                        <tr *ngIf="activityLogs.length === 0">
+                            <td colspan="5" class="py-4 text-center text-sm text-gray-500">
+                                No recent activities
+                            </td>
                         </tr>
                     </tbody>
                 </table>
