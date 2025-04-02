@@ -5,11 +5,11 @@ import { UserListComponent } from './components/users/user-list/user-list.compon
 import { ProjectListComponent } from './components/project/project-list/project-list.component';
 import { TaskListComponent } from './components/tasks/task-list/task-list.component';
 import { PageNotFoundComponent } from './components/errors/page-not-found/page-not-found.component';
-import { ProjectDetailsComponent } from './components/project/project-detail/project-detail.component';
 import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { ProjectDetailComponent } from './components/project/project-detail/project-detail.component';
 
 export const routes: Routes = [
   {
@@ -44,7 +44,7 @@ export const routes: Routes = [
   },
   {
     path: 'projects/:id',
-    component: ProjectDetailsComponent,
+    component: ProjectDetailComponent,
     canActivate: [AuthGuard]
   },
   {

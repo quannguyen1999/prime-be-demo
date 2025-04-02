@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -63,9 +62,18 @@ public class TaskImpl implements TaskService {
         //Validate The list task
         taskValidator.validateIdProject(projectId);
         List<Task> tasks = byMe ? taskRepository.findByProjectIdAndAssignedTo(projectId, SecurityUtil.getIDUser()) : taskRepository.findByProjectId(projectId);
-        return tasks.isEmpty() ? new ArrayList<>() : tasks.stream()
-                .map(TaskMapper.MAPPER::taskToTaskResponse)
-                .collect(Collectors.toList());
+        Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(tasks.stream().map(Task::getAssignedTo).collect(Collectors.toList()));
+
+        List<TaskResponse> taskResponse = tasks.stream()
+                .map(TaskMapper.MAPPER::taskToTaskResponse).toList();
+
+        //Map Username
+        taskResponse.parallelStream().forEach(taskResponse1 -> {
+            if (getListUserNames.containsKey(taskResponse1.getAssignedTo())) {
+                taskResponse1.setUserName(getListUserNames.get(taskResponse1.getAssignedTo()));
+            }
+        });
+        return taskResponse;
     }
 
     @Override

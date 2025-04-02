@@ -1,187 +1,76 @@
-<div class="p-8 bg-gray-50 min-h-screen">
+<div class="p-6">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-        <div>
-            <button class="flex items-center text-gray-600 hover:text-gray-900 mb-4" routerLink="/project">
-                <mat-icon class="mr-2">arrow_back</mat-icon>
-                Back to Projects
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-2">
+            <button mat-icon-button routerLink="/projects">
+                <mat-icon>arrow_back</mat-icon>
             </button>
-            <h1 class="text-2xl font-bold text-gray-900">Project Tasks</h1>
+            <h1 class="text-2xl font-medium">Project Tasks</h1>
         </div>
-        <button mat-raised-button color="primary" class="flex items-center">
-            <mat-icon class="mr-2">add</mat-icon>
+        <button mat-flat-button color="primary" class="flex items-center gap-2" (click)="openAddTaskDialog()">
+            <mat-icon>add</mat-icon>
             New Task
         </button>
     </div>
 
     <!-- Task Board -->
-    <div class="grid grid-cols-5 gap-4">
-        <!-- Backlog Column -->
-        <div class="bg-white rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-semibold text-gray-700 flex items-center">
-                    <span class="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                    Backlog ({{getTaskCount('backlog')}})
-                </h2>
-                <button mat-icon-button>
-                    <mat-icon class="text-gray-400">add</mat-icon>
-                </button>
-            </div>
-            <div class="space-y-3 min-h-[100px]" cdkDropList id="backlog" [cdkDropListData]="backlogTasks" 
-                 [cdkDropListConnectedTo]="['doing', 'on_hold', 'done', 'archived']"
-                 (cdkDropListDropped)="drop($event)">
-                <div *ngIf="backlogTasks.length === 0" class="h-[100px] border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
-                    <span class="text-gray-400">Drop tasks here</span>
+    <div class="grid grid-cols-5 gap-6">
+        <div *ngFor="let group of taskGroups" class="bg-white rounded-lg shadow-sm">
+            <!-- Column Header -->
+            <div class="flex items-center justify-between p-4 border-b">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" 
+                          [ngClass]="{
+                            'bg-gray-400': group.status === 'BACK_LOG',
+                            'bg-blue-400': group.status === 'DOING',
+                            'bg-yellow-400': group.status === 'ON_HOLD',
+                            'bg-green-400': group.status === 'DONE',
+                            'bg-red-400': group.status === 'ARCHIVED'
+                          }"></span>
+                    <h3 class="text-gray-700">{{group.displayName}} ({{group.count}})</h3>
                 </div>
-                <div *ngFor="let task of backlogTasks" 
-                     class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow cursor-move"
-                     cdkDrag>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-medium text-gray-900">{{task.title}}</h3>
-                        <span [class]="getPriorityColor(task.priority)" class="px-2 py-1 text-xs rounded-full">
-                            {{task.priority}}
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-500">{{task.assignee}}</span>
-                        <span *ngIf="task.dueDate" class="text-gray-500">{{task.dueDate | date:'MMM d'}}</span>
-                    </div>
-                </div>
+                <!-- <button mat-icon-button class="text-gray-400">
+                    <mat-icon>add</mat-icon>
+                </button> -->
             </div>
-        </div>
 
-        <!-- Doing Column -->
-        <div class="bg-white rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-semibold text-gray-700 flex items-center">
-                    <span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                    Doing ({{getTaskCount('doing')}})
-                </h2>
-                <button mat-icon-button>
-                    <mat-icon class="text-gray-400">add</mat-icon>
-                </button>
-            </div>
-            <div class="space-y-3 min-h-[100px]" cdkDropList id="doing" [cdkDropListData]="doingTasks"
-                 [cdkDropListConnectedTo]="['backlog', 'on_hold', 'done', 'archived']"
+            <!-- Task Cards -->
+            <div class="p-4 space-y-4 min-h-[200px]"
+                 cdkDropList
+                 [id]="group.status"
+                 [cdkDropListData]="group.tasks"
+                 [cdkDropListConnectedTo]="getConnectedLists(group.status)"
                  (cdkDropListDropped)="drop($event)">
-                <div *ngIf="doingTasks.length === 0" class="h-[100px] border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
-                    <span class="text-gray-400">Drop tasks here</span>
-                </div>
-                <div *ngFor="let task of doingTasks"
-                     class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow cursor-move"
-                     cdkDrag>
+                <div *ngFor="let task of group.tasks" 
+                     class="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
+                     [class.cursor-move]="group.status !== 'ARCHIVED'"
+                     [class.cursor-not-allowed]="group.status === 'ARCHIVED'"
+                     [cdkDragDisabled]="group.status === 'ARCHIVED'"
+                     cdkDrag
+                     [cdkDragData]="task">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-medium text-gray-900">{{task.title}}</h3>
-                        <span [class]="getPriorityColor(task.priority)" class="px-2 py-1 text-xs rounded-full">
+                        <h4 class="text-sm font-medium text-gray-900">{{task.title}}</h4>
+                        <span *ngIf="task.priority" 
+                              class="text-xs px-2 py-1 rounded-full"
+                              [ngClass]="{
+                                'bg-yellow-100 text-yellow-800': task.priority === 'medium',
+                                'bg-red-100 text-red-800': task.priority === 'high',
+                                'bg-gray-100 text-gray-800': task.priority === 'low'
+                              }">
                             {{task.priority}}
                         </span>
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-500">{{task.assignee}}</span>
-                        <span *ngIf="task.dueDate" class="text-gray-500">{{task.dueDate | date:'MMM d'}}</span>
+                    <div class="text-sm text-gray-500">
+                        {{task.userName}}
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- On Hold Column -->
-        <div class="bg-white rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-semibold text-gray-700 flex items-center">
-                    <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                    On Hold ({{getTaskCount('on_hold')}})
-                </h2>
-                <button mat-icon-button>
-                    <mat-icon class="text-gray-400">add</mat-icon>
-                </button>
-            </div>
-            <div class="space-y-3 min-h-[100px]" cdkDropList id="on_hold" [cdkDropListData]="onHoldTasks"
-                 [cdkDropListConnectedTo]="['backlog', 'doing', 'done', 'archived']"
-                 (cdkDropListDropped)="drop($event)">
-                <div *ngIf="onHoldTasks.length === 0" class="h-[100px] border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
-                    <span class="text-gray-400">Drop tasks here</span>
-                </div>
-                <div *ngFor="let task of onHoldTasks"
-                     class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow cursor-move"
-                     cdkDrag>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-medium text-gray-900">{{task.title}}</h3>
-                        <span [class]="getPriorityColor(task.priority)" class="px-2 py-1 text-xs rounded-full">
-                            {{task.priority}}
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-500">{{task.assignee}}</span>
-                        <span *ngIf="task.dueDate" class="text-gray-500">{{task.dueDate | date:'MMM d'}}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Done Column -->
-        <div class="bg-white rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-semibold text-gray-700 flex items-center">
-                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                    Done ({{getTaskCount('done')}})
-                </h2>
-                <button mat-icon-button>
-                    <mat-icon class="text-gray-400">add</mat-icon>
-                </button>
-            </div>
-            <div class="space-y-3 min-h-[100px]" cdkDropList id="done" [cdkDropListData]="doneTasks"
-                 [cdkDropListConnectedTo]="['backlog', 'doing', 'on_hold', 'archived']"
-                 (cdkDropListDropped)="drop($event)">
-                <div *ngIf="doneTasks.length === 0" class="h-[100px] border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
-                    <span class="text-gray-400">Drop tasks here</span>
-                </div>
-                <div *ngFor="let task of doneTasks"
-                     class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow cursor-move"
-                     cdkDrag>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-medium text-gray-900">{{task.title}}</h3>
-                        <span [class]="getPriorityColor(task.priority)" class="px-2 py-1 text-xs rounded-full">
-                            {{task.priority}}
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-500">{{task.assignee}}</span>
-                        <span *ngIf="task.dueDate" class="text-gray-500">{{task.dueDate | date:'MMM d'}}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Archived Column -->
-        <div class="bg-white rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-semibold text-gray-700 flex items-center">
-                    <span class="w-2 h-2 bg-red-400 rounded-full mr-2"></span>
-                    Archived ({{getTaskCount('archived')}})
-                </h2>
-                <button mat-icon-button>
-                    <mat-icon class="text-gray-400">add</mat-icon>
-                </button>
-            </div>
-            <div class="space-y-3 min-h-[100px]" cdkDropList id="archived" [cdkDropListData]="archivedTasks"
-                 [cdkDropListConnectedTo]="['backlog', 'doing', 'on_hold', 'done']"
-                 (cdkDropListDropped)="drop($event)">
-                <div *ngIf="archivedTasks.length === 0" class="h-[100px] border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
-                    <span class="text-gray-400">Drop tasks here</span>
-                </div>
-                <div *ngFor="let task of archivedTasks"
-                     class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow cursor-move"
-                     cdkDrag>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-medium text-gray-900">{{task.title}}</h3>
-                        <span [class]="getPriorityColor(task.priority)" class="px-2 py-1 text-xs rounded-full">
-                            {{task.priority}}
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-500">{{task.assignee}}</span>
-                        <span *ngIf="task.dueDate" class="text-gray-500">{{task.dueDate | date:'MMM d'}}</span>
-                    </div>
+                <!-- Empty State -->
+                <div *ngIf="group.tasks.length === 0" 
+                     class="h-[100px] border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
+                    <span class="text-gray-400">
+                        {{group.status === 'ARCHIVED' ? 'No archived tasks' : 'Drop tasks here'}}
+                    </span>
                 </div>
             </div>
         </div>

@@ -29,4 +29,26 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     @Query("SELECT p FROM Task p WHERE " +
             "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) and p.assignedTo = :assignIdUser")
     Page<Task> searchTaskByKeyWordAndAssignIdUser(@Param("keyword") String keyword, @Param("assignIdUser") UUID assignIdUser, PageRequest pageRequest);
+
+    @Query("SELECT t.status as status, COUNT(t) as count FROM Task t GROUP BY t.status")
+    List<Object[]> countTasksByStatus();
+
+    @Query("SELECT t.project.id as projectId, t.assignedTo as userId, COUNT(t) as taskCount " +
+            "FROM Task t GROUP BY t.project.id, t.assignedTo")
+    List<Object[]> countTasksByProjectAndUser();
+
+    @Query("SELECT t.project.id as projectId, COUNT(t) as totalTasks, " +
+            "COUNT(CASE WHEN t.status = 'DONE' THEN 1 END) as completedTasks " +
+            "FROM Task t GROUP BY t.project.id")
+    List<Object[]> getProjectCompletionStats();
+
+    @Query("SELECT p.id as projectId, p.name as projectName, t.status as status, COUNT(t) as count " +
+            "FROM Project p LEFT JOIN Task t ON p.id = t.project.id " +
+            "GROUP BY p.id, p.name, t.status")
+    List<Object[]> getProjectTaskStatusStats();
+
+    @Query("SELECT t.status as status, COUNT(t) as count " +
+           "FROM Task t " +
+           "GROUP BY t.status")
+    List<Object[]> getOverallTaskStatusStats();
 }

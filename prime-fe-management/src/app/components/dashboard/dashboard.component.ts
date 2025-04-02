@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
 import { curveLinear } from 'd3-shape';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ProjectService, ProjectStatistics, ProjectSummary, OverallStatistics, StatusBreakdown } from '../../services/project.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { FindPipe } from '../../shared/pipes/find.pipe';
 
 interface ProjectCard {
   id: string;
@@ -29,10 +32,16 @@ interface ActivityLog {
   standalone: true,
   imports: [
     SharedModule,
-    NgxChartsModule
+    NgxChartsModule,
+    FindPipe
   ]
 })
 export class DashboardComponent implements OnInit {
+  statistics: ProjectStatistics | null = null;
+  overallStats: OverallStatistics | null = null;
+  inProgressCount = 0;
+  upcomingCount = 0;
+  totalProjects = 0;
   currentDate = new Date();
   
   projectStats = {
@@ -50,43 +59,73 @@ export class DashboardComponent implements OnInit {
   showYAxisLabel = true;
   timeline = true;
 
+  legendPosition: LegendPosition = LegendPosition.Below;
+
   progressData = [
     {
-      name: 'Completed',
+      name: 'Backlog',
       series: [
-        { name: 'Jan', value: 20 },
-        { name: 'Feb', value: 35 },
-        { name: 'Mar', value: 45 },
-        { name: 'Apr', value: 40 },
-        { name: 'May', value: 55 },
-        { name: 'Jun', value: 50 }
+        { name: 'Jan', value: 15 },
+        { name: 'Feb', value: 20 },
+        { name: 'Mar', value: 25 },
+        { name: 'Apr', value: 30 },
+        { name: 'May', value: 35 },
+        { name: 'Jun', value: 40 }
       ]
     },
     {
-      name: 'In Progress',
+      name: 'Doing',
       series: [
-        { name: 'Jan', value: 15 },
+        { name: 'Jan', value: 10 },
+        { name: 'Feb', value: 15 },
+        { name: 'Mar', value: 20 },
+        { name: 'Apr', value: 25 },
+        { name: 'May', value: 30 },
+        { name: 'Jun', value: 35 }
+      ]
+    },
+    {
+      name: 'On Hold',
+      series: [
+        { name: 'Jan', value: 5 },
+        { name: 'Feb', value: 8 },
+        { name: 'Mar', value: 12 },
+        { name: 'Apr', value: 15 },
+        { name: 'May', value: 18 },
+        { name: 'Jun', value: 20 }
+      ]
+    },
+    {
+      name: 'Done',
+      series: [
+        { name: 'Jan', value: 20 },
         { name: 'Feb', value: 25 },
         { name: 'Mar', value: 30 },
         { name: 'Apr', value: 35 },
         { name: 'May', value: 40 },
         { name: 'Jun', value: 45 }
       ]
+    },
+    {
+      name: 'Archived',
+      series: [
+        { name: 'Jan', value: 8 },
+        { name: 'Feb', value: 12 },
+        { name: 'Mar', value: 16 },
+        { name: 'Apr', value: 20 },
+        { name: 'May', value: 24 },
+        { name: 'Jun', value: 28 }
+      ]
     }
   ];
 
-  projectTypeData = [
-    { name: 'Development', value: 25 },
-    { name: 'Design', value: 15 },
-    { name: 'Testing', value: 10 },
-    { name: 'Research', value: 12 }
-  ];
+  projectTypeData: any[] = [];
 
   colorScheme: Color = {
-    name: 'custom',
+    name: 'taskStatus',
     selectable: true,
     group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA']
+    domain: ['#9CA3AF', '#3B82F6', '#FBBF24', '#10B981', '#EF4444']  // gray, blue, yellow, green, red
   };
 
   curve = curveLinear;
@@ -206,9 +245,105 @@ export class DashboardComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private projectService: ProjectService,
+    private snackBar: MatSnackBar
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadStatistics();
+    this.loadOverallStatistics();
+  }
+
+  loadStatistics(): void {
+    this.projectService.getProjectStatistics().subscribe({
+      next: (data) => {
+        this.statistics = data;
+        this.calculateCounts();
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to load project statistics', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  loadOverallStatistics(): void {
+    this.projectService.getOverallStatistics().subscribe({
+      next: (data) => {
+        this.overallStats = data;
+        this.updateTaskStatusChart();
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to load overall statistics', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  private calculateCounts(): void {
+    if (!this.statistics) return;
+
+    // Count in progress projects (projects with tasks in DOING status)
+    this.inProgressCount = this.statistics.projectSummaries.filter(
+      project => project.members.length > 0
+    ).length;
+
+    // Count upcoming projects (projects with no tasks yet)
+    this.upcomingCount = this.statistics.projectSummaries.filter(
+      project => project.members.length === 0
+    ).length;
+
+    // Total projects
+    this.totalProjects = this.statistics.projectSummaries.length;
+  }
+
+  private updateTaskStatusChart(): void {
+    if (!this.overallStats?.projectStats?.[0]?.statusBreakdown) return;
+
+    const breakdown = this.overallStats.projectStats[0].statusBreakdown;
+    this.projectTypeData = [
+      {
+        name: 'Backlog',
+        value: breakdown.backlogTasks,
+        percentage: breakdown.backlogPercentage
+      },
+      {
+        name: 'Doing',
+        value: breakdown.doingTasks,
+        percentage: breakdown.doingPercentage
+      },
+      {
+        name: 'On Hold',
+        value: breakdown.onHoldTasks,
+        percentage: breakdown.onHoldPercentage
+      },
+      {
+        name: 'Done',
+        value: breakdown.doneTasks,
+        percentage: breakdown.donePercentage
+      },
+      {
+        name: 'Archived',
+        value: breakdown.archivedTasks,
+        percentage: breakdown.archivedPercentage
+      }
+    ];
+  }
+
+  formatValue(value: number): string {
+    return `${value} Tasks`;
+  }
+
+  getProjectProgress(project: ProjectSummary): number {
+    return Math.round(project.completionPercentage * 100);
+  }
+
+  getProgressColor(percentage: number): string {
+    if (percentage >= 75) return 'bg-green-500';
+    if (percentage >= 50) return 'bg-blue-500';
+    if (percentage >= 25) return 'bg-yellow-500';
+    return 'bg-gray-500';
+  }
 
   toggleView(type: 'grid' | 'list'): void {
     this.viewType = type;

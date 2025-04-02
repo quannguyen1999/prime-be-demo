@@ -4,6 +4,8 @@ import com.prime.constants.PathApi;
 import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.ProjectRequest;
 import com.prime.models.response.ProjectResponse;
+import com.prime.models.response.ProjectStatisticsResponse;
+import com.prime.models.response.ProjectOverallStatisticsResponse;
 import com.prime.service.ProjectService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -68,8 +70,26 @@ public class ProjectController {
      * @return ResponseEntity with a success message and HTTP 200 status.
      */
     @DeleteMapping
-    public ResponseEntity<String> deleteProject(@RequestParam UUID projectId) {
+    public ResponseEntity<Void> deleteProject(@RequestParam UUID projectId) {
         projectService.deleteProject(projectId);
-        return ResponseEntity.ok("Project deleted successfully.");
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping(value = PathApi.GET_PROJECT_BY_ID)
+    public ResponseEntity<ProjectResponse> getProjectById(@RequestParam UUID projectId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(projectService.getProjectById(projectId));
+    }
+
+    @GetMapping(value = PathApi.GET_PROJECT_STATISTICS)
+    public ResponseEntity<ProjectStatisticsResponse> getProjectStatistics() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(projectService.getProjectStatistics());
+    }
+
+    @GetMapping(value = "/overall-statistics")
+    public ResponseEntity<ProjectOverallStatisticsResponse> getProjectOverallStatistics() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(projectService.getProjectOverallStatistics());
     }
 }

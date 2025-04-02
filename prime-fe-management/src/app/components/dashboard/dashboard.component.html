@@ -2,6 +2,25 @@
 <div class="p-8 bg-gray-50 min-h-screen">
    
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+
+    <!-- Overall Statistics -->
+    <div class="grid grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Total Projects</h3>
+            <p class="text-3xl font-bold text-gray-900">{{overallStats?.totalProjects ?? 0}}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Total Tasks</h3>
+            <p class="text-3xl font-bold text-gray-900">{{overallStats?.totalTasks ?? 0}}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Overall Progress</h3>
+            <p class="text-3xl font-bold text-gray-900">
+                {{overallStats?.projectStats?.[0]?.completionPercentage ?? 0 | number:'1.0-0'}}%
+            </p>
+        </div>
+    </div>
+
     <!-- Charts Section -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
        
@@ -12,30 +31,41 @@
                 [view]="[400, 300]"
                 [scheme]="colorScheme"
                 [results]="progressData"
-                [gradient]="true"
+                [gradient]="false"
                 [xAxis]="true"
                 [yAxis]="true"
                 [showXAxisLabel]="true"
                 [showYAxisLabel]="true"
                 [xAxisLabel]="'Month'"
-                [yAxisLabel]="'Projects'"
+                [yAxisLabel]="'Tasks'"
                 [timeline]="false"
                 [autoScale]="true"
-                [curve]="curve">
+                [curve]="curve"
+                [legend]="true"
+                [legendPosition]="legendPosition"
+                [tooltipDisabled]="false">
             </ngx-charts-line-chart>
         </div>
 
         <!-- Pie Chart -->
         <div class="bg-white rounded-xl shadow-sm p-6 overflow-hidden">
-            <h2 class="text-lg font-semibold text-gray-900 mb-6">Projects by Type</h2>
-            <ngx-charts-advanced-pie-chart
-                [view]="[400, 300]"
-                [scheme]="colorScheme"
-                [results]="projectTypeData"
-                [gradient]="false">
-            </ngx-charts-advanced-pie-chart>
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Tasks by Status</h2>
+            <div class="flex flex-col items-center">
+            
+                <ngx-charts-advanced-pie-chart
+                    [view]="[400, 300]"
+                    [scheme]="colorScheme"
+                    [results]="projectTypeData"
+                    [gradient]="false"
+                    [animations]="true"
+                    [label]="'Tasks'"
+                    [tooltipDisabled]="false"
+                    [valueFormatting]="formatValue">
+                </ngx-charts-advanced-pie-chart>
+            </div>
         </div>
 
+      
         <!-- Activity Log -->
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-6">Recent Activities</h2>
@@ -68,119 +98,126 @@
             </div>
         </div>
     </div>
- <!-- Header Section -->
- <div class="mb-12">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Projects</h1>
-    <div class="flex justify-between items-start">
-        <!-- Stats -->
-        <div class="flex space-x-16">
-            <!-- In Progress -->
-            <div>
-                <div class="text-4xl font-bold text-blue-600 mb-1">{{projectStats.inProgress}}</div>
-                <div class="text-gray-600 text-sm">In Progress</div>
+<div class="p-6">
+    <h1 class="text-2xl font-medium mb-8">Projects</h1>
+
+    <!-- Statistics -->
+    <div class="grid grid-cols-5 gap-6 mb-8">
+        <!-- Backlog -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                <h3 class="text-gray-600">Backlog</h3>
             </div>
-            <!-- Upcoming -->
-            <div>
-                <div class="text-4xl font-bold text-purple-600 mb-1">{{projectStats.upcoming}}</div>
-                <div class="text-gray-600 text-sm">Upcoming</div>
-            </div>
-            <!-- Total Projects -->
-            <div>
-                <div class="text-4xl font-bold text-gray-900 mb-1">{{projectStats.total}}</div>
-                <div class="text-gray-600 text-sm">Total Projects</div>
-            </div>
+            <h2 class="text-4xl font-bold text-gray-600">
+                {{(statistics?.statusCounts | find:'status':'BACK_LOG')?.count || 0}}
+            </h2>
         </div>
 
-        <!-- Date and View Toggle -->
-        <div class="flex items-center space-x-6">
-            <div class="text-lg font-medium text-gray-900">
-                {{currentDate | date:'MMMM, d'}}
+        <!-- Doing -->
+        <div class="bg-blue-50 rounded-lg p-6">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                <h3 class="text-blue-600">Doing</h3>
             </div>
-            <div class="bg-white rounded-lg shadow-sm p-1">
-                <button (click)="toggleView('list')"
-                        [class.bg-gray-100]="viewType === 'list'"
-                        class="p-2 rounded-md transition-colors duration-200">
-                    <mat-icon [class.text-gray-900]="viewType === 'list'" 
-                            [class.text-gray-400]="viewType !== 'list'">view_list</mat-icon>
-                </button>
-                <button (click)="toggleView('grid')"
-                        [class.bg-gray-100]="viewType === 'grid'"
-                        class="p-2 rounded-md transition-colors duration-200">
-                    <mat-icon [class.text-gray-900]="viewType === 'grid'"
-                            [class.text-gray-400]="viewType !== 'grid'">grid_view</mat-icon>
-                </button>
+            <h2 class="text-4xl font-bold text-blue-600">
+                {{(statistics?.statusCounts | find:'status':'DOING')?.count || 0}}
+            </h2>
+        </div>
+
+        <!-- On Hold -->
+        <div class="bg-yellow-50 rounded-lg p-6">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                <h3 class="text-yellow-600">On Hold</h3>
             </div>
+            <h2 class="text-4xl font-bold text-yellow-600">
+                {{(statistics?.statusCounts | find:'status':'ON_HOLD')?.count || 0}}
+            </h2>
+        </div>
+
+        <!-- Done -->
+        <div class="bg-green-50 rounded-lg p-6">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                <h3 class="text-green-600">Done</h3>
+            </div>
+            <h2 class="text-4xl font-bold text-green-600">
+                {{(statistics?.statusCounts | find:'status':'DONE')?.count || 0}}
+            </h2>
+        </div>
+
+        <!-- Archived -->
+        <div class="bg-red-50 rounded-lg p-6">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                <h3 class="text-red-600">Archived</h3>
+            </div>
+            <h2 class="text-4xl font-bold text-red-600">
+                {{(statistics?.statusCounts | find:'status':'ARCHIVED')?.count || 0}}
+            </h2>
         </div>
     </div>
-</div>
-    <!-- Projects Grid/List -->
-    <div [class]="viewType === 'grid' ? 'grid grid-cols-2 gap-6' : 'space-y-4'" class="md:grid-cols-2 lg:grid-cols-3">
-        <div *ngFor="let project of projects" 
-             class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
-             [class.p-6]="viewType === 'grid'"
-             [class.p-4]="viewType === 'list'"
-             (click)="navigateToProject(project.id)">
-            <!-- Project Header -->
-            <div class="flex justify-between items-start mb-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="text-gray-500">{{currentDate | date:'MMMM, d'}}</div>
+        <div class="flex gap-2">
+            <button mat-icon-button [class.text-gray-900]="viewType === 'list'" (click)="toggleView('list')">
+                <mat-icon>view_list</mat-icon>
+            </button>
+            <button mat-icon-button [class.text-gray-900]="viewType === 'grid'" (click)="toggleView('grid')">
+                <mat-icon>grid_view</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Project Grid -->
+    <div class="grid grid-cols-3 gap-6" *ngIf="statistics">
+        <div *ngFor="let project of statistics.projectSummaries" 
+             class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{project.title}}</h3>
-                    <p class="text-gray-500 text-sm">{{project.type}}</p>
+                    <h3 class="text-lg font-medium text-gray-900">{{project.name}}</h3>
+                    <p class="text-sm text-gray-500">{{project.description}}</p>
                 </div>
-                <button mat-icon-button [matMenuTriggerFor]="menu" class="text-gray-400 hover:text-gray-600" (click)="$event.stopPropagation()">
+                <button mat-icon-button [matMenuTriggerFor]="menu">
                     <mat-icon>more_vert</mat-icon>
                 </button>
-                <mat-menu #menu="matMenu" class="rounded-lg">
-                    <button mat-menu-item class="text-sm">
-                        <mat-icon class="text-gray-500">edit</mat-icon>
-                        <span>Edit</span>
-                    </button>
-                    <button mat-menu-item class="text-sm">
-                        <mat-icon class="text-gray-500">delete</mat-icon>
-                        <span>Delete</span>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item [routerLink]="['/projects', project.id]">
+                        <mat-icon>visibility</mat-icon>
+                        <span>View Details</span>
                     </button>
                 </mat-menu>
             </div>
 
-            <!-- Progress Bar -->
-            <div class="mb-6">
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="text-gray-600">Progress</span>
-                    <span class="text-gray-900 font-medium">{{project.progress}}%</span>
+            <!-- Progress -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Progress</span>
+                    <span class="text-sm font-medium">{{getProjectProgress(project)}}%</span>
                 </div>
-                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div class="h-full rounded-full transition-all duration-300"
-                         [style.width.%]="project.progress"
-                         [class]="getProgressBarColor(project.progress)">
+                <div class="h-2 bg-gray-100 rounded-full">
+                    <div class="h-full rounded-full transition-all"
+                         [ngClass]="getProgressColor(getProjectProgress(project))"
+                         [style.width.%]="getProjectProgress(project)">
                     </div>
                 </div>
             </div>
 
-            <!-- Project Footer -->
-            <div class="flex justify-between items-center">
-                <!-- Team Members -->
-                <div class="flex -space-x-2">
-                    <div *ngFor="let member of project.team" 
-                         class="w-8 h-8 rounded-full ring-2 ring-white"
-                         [matTooltip]="member.name">
-                        <img *ngIf="member.avatar" 
-                             [src]="member.avatar" 
-                             [alt]="member.name" 
-                             class="w-full h-full object-cover rounded-full">
-                        <div *ngIf="!member.avatar" 
-                             class="w-full h-full flex items-center justify-center bg-purple-500 text-white text-sm font-medium rounded-full">
-                            {{member.name[0]}}
-                        </div>
+            <!-- Team Members -->
+            <div *ngIf="project.members.length > 0">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Team Members</h4>
+                <div class="flex flex-wrap gap-2">
+                    <div *ngFor="let member of project.members" 
+                         class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
+                        {{member.username}} ({{member.totalTasks}})
                     </div>
-                    <button mat-icon-button 
-                            class="w-8 h-8 bg-gray-50 rounded-full ring-2 ring-white flex items-center justify-center">
-                        <mat-icon class="text-gray-400 text-base">add</mat-icon>
-                    </button>
                 </div>
-
-                <!-- Days Left -->
-                <div class="text-sm text-gray-500 font-medium">
-                    {{project.daysLeft}} Days Left
-                </div>
+            </div>
+            <div *ngIf="project.members.length === 0" class="text-sm text-gray-500">
+                No team members assigned
             </div>
         </div>
     </div>

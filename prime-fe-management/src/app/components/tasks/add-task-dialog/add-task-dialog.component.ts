@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ProjectService, PaginatedResponse, Project } from '../../../services/project.service';
 import { UserService } from '../../../services/user.service';
 import { TaskService } from '../../../services/task.service';
@@ -16,6 +16,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+export interface AddTaskDialogData {
+  preselectedProject?: {
+    id: string;
+    name: string;
+  };
+  disableProject?: boolean;
+}
 
 @Component({
   selector: 'app-add-task-dialog',
@@ -42,17 +50,24 @@ export class AddTaskDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddTaskDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: AddTaskDialogData,
     private projectService: ProjectService,
     private userService: UserService,
     private taskService: TaskService,
     private snackBar: MatSnackBar
   ) {
     this.taskForm = this.fb.group({
-      title: ['', [Validators.required]],
-      projectId: ['', [Validators.required]],
-      description: ['', [Validators.required]],
-      assignedTo: ['', [Validators.required]]
+      title: ['', Validators.required],
+      projectId: [data.preselectedProject || '', Validators.required],
+      description: ['', Validators.required],
+      status: ['BACK_LOG', Validators.required],
+      assignedTo: ['', Validators.required]
     });
+
+    // If project is pre-selected and should be disabled
+    if (data.preselectedProject && data.disableProject) {
+      this.taskForm.get('projectId')?.disable();
+    }
 
     // Setup project search with autocomplete
     this.filteredProjects = this.taskForm.get('projectId')!.valueChanges.pipe(
@@ -89,10 +104,14 @@ export class AddTaskDialogComponent implements OnInit {
     if (this.taskForm.valid && !this.isLoading) {
       this.isLoading = true;
       const formValue = this.taskForm.value;
+      
+      // Use preselectedProject.id if available, otherwise use the selected project's id
+      const projectId = this.data.preselectedProject?.id || formValue.projectId?.id;
+
       const taskData = {
         title: formValue.title,
         description: formValue.description,
-        projectId: formValue.projectId?.id || formValue.projectId,
+        projectId: projectId,
         assignedTo: formValue.assignedTo?.username || formValue.assignedTo
       };
 

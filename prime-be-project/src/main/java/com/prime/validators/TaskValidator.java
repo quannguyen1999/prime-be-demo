@@ -58,7 +58,6 @@ public class TaskValidator extends CommonValidator {
     }
 
     public UserResponse validateUpdate(TaskRequest taskRequest, UUID taskId) {
-        UserResponse userResponse = null;
         checkEmpty().accept(taskRequest, TASK_INVALID);
         checkCondition().accept(ObjectUtils.isEmpty(taskRepository.findById(taskId)), TASK_NOT_EXISTS);
 
@@ -68,9 +67,9 @@ public class TaskValidator extends CommonValidator {
         if (StringUtils.hasLength(taskRequest.getDescription())) {
             validateCheckDescription(taskRequest.getDescription());
         }
+        UserResponse userResponse = userServiceClient.findUserByUsername(taskRequest.getAssignedTo());
         if (StringUtils.hasLength(taskRequest.getAssignedTo()) && !taskRequest.getAssignedTo().equalsIgnoreCase(SecurityUtil.getUserName())) {
             checkCondition().accept(!SecurityUtil.isAdmin(), USER_UNAUTHORIZED);
-            userResponse = userServiceClient.findUserByUsername(taskRequest.getAssignedTo());
             checkCondition().accept(ObjectUtils.isEmpty(userResponse), USER_INVALID);
         }
         return userResponse;

@@ -24,7 +24,9 @@
                        matInput
                        formControlName="projectId"
                        [matAutocomplete]="auto"
-                       placeholder="Search for a project">
+                       [readonly]="data.disableProject"
+                       [placeholder]="data.disableProject ? '' : 'Search for a project'"
+                       [value]="data.preselectedProject?.name || ''">
                 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProjectFn">
                     <mat-option *ngFor="let project of (filteredProjects | async)?.data" [value]="project">
                         {{project.name}}
