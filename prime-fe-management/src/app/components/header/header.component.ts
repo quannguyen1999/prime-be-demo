@@ -46,7 +46,6 @@ export class HeaderComponent {
   }
 
   logout() {
-    // Implement logout logic here
-    console.log('Logging out...');
+    this.authService.logout();
   }
 }

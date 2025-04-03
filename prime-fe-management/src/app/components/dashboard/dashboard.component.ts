@@ -7,6 +7,15 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ProjectService, ProjectStatistics, ProjectSummary, OverallStatistics, ActivityLog, ActivityLogResponse } from '../../services/project.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FindPipe } from '../../shared/pipes/find.pipe';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 interface ProjectCard {
   id: string;
@@ -23,7 +32,14 @@ interface ProjectCard {
   templateUrl: './dashboard.component.html',
   standalone: true,
   imports: [
-    SharedModule,
+    CommonModule,
+    RouterModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatMenuModule,
+    MatPaginatorModule,
     NgxChartsModule,
     FindPipe
   ]
@@ -200,6 +216,9 @@ export class DashboardComponent implements OnInit {
   viewType: 'grid' | 'list' = 'grid';
 
   activityLogs: ActivityLog[] = [];
+  totalActivityLogs: number = 0;
+  activityLogsPageSize: number = 5;
+  activityLogsPageIndex: number = 0;
 
   constructor(
     private router: Router,
@@ -238,9 +257,10 @@ export class DashboardComponent implements OnInit {
   }
 
   loadActivityLogs(): void {
-    this.projectService.getActivityLogs().subscribe({
+    this.projectService.getActivityLogs(this.activityLogsPageIndex, this.activityLogsPageSize).subscribe({
       next: (response) => {
         this.activityLogs = response.data;
+        this.totalActivityLogs = response.total;
       },
       error: (error) => {
         this.snackBar.open('Failed to load activity logs', 'Close', { duration: 3000 });
@@ -303,7 +323,8 @@ export class DashboardComponent implements OnInit {
   }
 
   getProjectProgress(project: ProjectSummary): number {
-    return Math.round(project.completionPercentage * 100);
+  
+    return Math.round(project.completionPercentage);
   }
 
   getProgressColor(percentage: number): string {
@@ -348,5 +369,11 @@ export class DashboardComponent implements OnInit {
 
   navigateToProject(projectId: string) {
     this.router.navigate(['/projects', projectId]);
+  }
+
+  onActivityLogPageChange(event: PageEvent): void {
+    this.activityLogsPageIndex = event.pageIndex;
+    this.activityLogsPageSize = event.pageSize;
+    this.loadActivityLogs();
   }
 }

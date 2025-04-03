@@ -69,9 +69,9 @@ export const listMenus: Menu[] = [
   },
   {
     id: 5,
-    name: 'Settings',
-    url: '/settings',
-    icon: 'settings',
+    name: 'Logout',
+    url: '/logout',
+    icon: 'logout',
     isSelected: false
   }
 ];

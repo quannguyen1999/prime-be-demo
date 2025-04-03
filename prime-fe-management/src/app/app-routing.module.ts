@@ -10,6 +10,9 @@ import { NoAuthGuard } from './guards/no-auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { ProjectDetailComponent } from './components/project/project-detail/project-detail.component';
+import { SidebarComponent } from './components/shared/sidebar/sidebar.component';
+import { AuthService } from './services/auth.service';
+import { inject } from '@angular/core';
 
 export const routes: Routes = [
   {
@@ -56,6 +59,17 @@ export const routes: Routes = [
     path: 'settings',
     redirectTo: 'home', // Temporary redirect until settings component is created
     pathMatch: 'full'
+  },
+  {
+    path: 'logout',
+    component: SidebarComponent,
+    resolve: {
+      logout: () => {
+        const authService = inject(AuthService);
+        authService.logout();
+        return true;
+      }
+    }
   },
   {
     path: '**',

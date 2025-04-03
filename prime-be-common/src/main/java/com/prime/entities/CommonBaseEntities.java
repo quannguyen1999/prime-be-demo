@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@MappedSuperclass  // ✅ This tells Hibernate to inherit fields in child entities
+@MappedSuperclass  // This tells Hibernate to inherit fields in child entities
 public class CommonBaseEntities {
 
     @Temporal(TemporalType.TIMESTAMP)
