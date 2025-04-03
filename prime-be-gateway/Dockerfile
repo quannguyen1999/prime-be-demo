@@ -8,13 +8,13 @@ MAINTAINER quannguyen
 RUN apt-get update && apt-get install -y curl
 
 #Copy File Jar to Docker
-COPY target/prime-be-project-0.0.1-SNAPSHOT.jar prime-be-project-0.0.1-SNAPSHOT.jar
+COPY target/prime-be-gateway-0.0.1-SNAPSHOT.jar prime-be-gateway-0.0.1-SNAPSHOT.jar
 
 #Excute command to run Spring boot
-#Cmd Example: java -jar target/prime-be-project-0.0.1-SNAPSHOT.jar
+#Cmd Example: java -jar target/prime-be-gateway-0.0.1-SNAPSHOT.jar
 ENTRYPOINT [ \
     "java", \
     "-jar", \
-    "prime-be-project-0.0.1-SNAPSHOT.jar" \
+    "prime-be-gateway-0.0.1-SNAPSHOT.jar" \
 ]
 

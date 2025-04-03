@@ -76,7 +76,8 @@ public class SecurityConfig {
             "/webjars/**",      // WebJars for Swagger
             "/oauth2/token",    // OAuth2 Token Generation
             "/registration",    // User Registration Endpoint
-            "/authenticator"   // Custom Authentication
+            "/authenticator",   // Custom Authentication
+            "/actuator/**" // Actuator
     );
 
     @Value("${custom-security.issuer}")  // OAuth2 Issuer URL (Defined in application.yml)

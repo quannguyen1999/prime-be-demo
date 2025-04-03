@@ -1,5 +1,7 @@
 package com.prime.service.impl;
 
+import com.prime.annotations.Audited;
+import com.prime.constants.ActivityType;
 import com.prime.constants.TaskStatus;
 import com.prime.entities.Project;
 import com.prime.feignClient.UserServiceClient;
@@ -12,20 +14,18 @@ import com.prime.models.response.TaskStatusCountResponse;
 import com.prime.repositories.ProjectRepository;
 import com.prime.repositories.TaskRepository;
 import com.prime.service.ProjectService;
+import com.prime.utils.SecurityUtil;
 import com.prime.validators.ProjectValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.prime.mappers.ProjectMapper.MAPPER;
-import com.prime.annotations.Audited;
-import com.prime.constants.ActivityType;
 
 @AllArgsConstructor
 @Service
@@ -41,6 +41,7 @@ public class ProjectImpl implements ProjectService {
     public ProjectResponse createProject(ProjectRequest projectRequest) {
         projectValidator.validateCreate(projectRequest);
         Project project = MAPPER.projectRequestToProject(projectRequest);
+        project.setOwnerId(SecurityUtil.getIDUser());
         Project projectInsert = projectRepository.save(project);
         return MAPPER.projectToProjectResponse(projectInsert);
     }

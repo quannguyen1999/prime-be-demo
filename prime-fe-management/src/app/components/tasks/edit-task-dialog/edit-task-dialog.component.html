@@ -1,0 +1,74 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-medium text-gray-900">Edit Task</h2>
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <div class="space-y-4">
+      <!-- Title Field -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Task Title</mat-label>
+        <input matInput formControlName="title" placeholder="Enter task title" required>
+        <mat-error *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched">
+          Task title is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description Field -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" placeholder="Enter task description" rows="4" required></textarea>
+        <mat-error *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched">
+          Description is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Status Field -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status" required>
+          <mat-option *ngFor="let status of statuses" [value]="status">
+            {{status}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="taskForm.get('status')?.invalid && taskForm.get('status')?.touched">
+          Status is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Assigned To Field -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Assigned To</mat-label>
+        <input type="text"
+               matInput
+               formControlName="assignedTo"
+               [matAutocomplete]="userAuto"
+               placeholder="Search for a user">
+        <mat-autocomplete #userAuto="matAutocomplete" [displayWith]="displayUserFn">
+          <mat-option *ngFor="let user of (filteredUsers | async)?.data" [value]="user">
+            {{user.username}}
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="taskForm.get('assignedTo')?.invalid && taskForm.get('assignedTo')?.touched">
+          Assignee is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-3 mt-6">
+      <button mat-button type="button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-flat-button 
+              color="primary" 
+              type="submit"
+              [disabled]="taskForm.invalid || isLoading">
+        {{isLoading ? 'Updating...' : 'Update Task'}}
+      </button>
+    </div>
+  </form>
+</div> 
