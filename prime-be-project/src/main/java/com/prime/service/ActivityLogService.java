@@ -8,10 +8,6 @@ public interface ActivityLogService {
     void logActivity(String userId,
                      String projectId,
                      ActivityType action);
-
-    CommonPageInfo<ActivityLogResponse> getActivityLogsByProject(String projectId, Integer page, Integer size);
-
-    CommonPageInfo<ActivityLogResponse> getActivityLogsByUser(String userId, Integer page, Integer size);
-
+    
     CommonPageInfo<ActivityLogResponse> getActivityLogs(Integer page, Integer size);
 } 

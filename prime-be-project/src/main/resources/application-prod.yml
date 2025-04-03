@@ -9,6 +9,8 @@ spring:
     url: jdbc:mysql://localhost:${spring.datasource.port}/${spring.datasource.schema}  # JDBC URL
     username: root  # Database username
     password: mysql  # Database password
+  jpa:
+    show-sql: true
 
   # Flyway Database Migration
   flyway:

@@ -40,10 +40,7 @@ public class TaskValidator extends CommonValidator {
         checkEmpty().accept(id, PRODUCT_INVALID);
         checkCondition().accept(ObjectUtils.isEmpty(projectRepository.findById(id).get()), PRODUCT_ID_NOT_FOUND);
     }
-
-    public void validateForListTaskAdmin(Integer page, Integer size) {
-    }
-
+    
     public UserResponse validateCheckUsername(String username) {
         checkEmpty().accept(username, USER_NAME_INVALID);
         UserResponse userResponse = userServiceClient.findUserByUsername(username);

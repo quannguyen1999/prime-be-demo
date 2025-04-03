@@ -6,7 +6,6 @@ import com.prime.models.response.ProjectOverallStatisticsResponse;
 import com.prime.models.response.ProjectResponse;
 import com.prime.models.response.ProjectStatisticsResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface ProjectService {
@@ -18,8 +17,6 @@ public interface ProjectService {
     void deleteProject(UUID projectId);
 
     ProjectResponse updateProject(ProjectRequest projectRequest, UUID projectId);
-
-    List<ProjectResponse> getAllProject();
 
     ProjectResponse getProjectById(UUID projectId);
 

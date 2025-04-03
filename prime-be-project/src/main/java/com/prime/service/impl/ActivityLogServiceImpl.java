@@ -41,18 +41,6 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     }
 
     @Override
-    public CommonPageInfo<ActivityLogResponse> getActivityLogsByProject(String projectId, Integer page, Integer size) {
-        Page<ActivityLog> activityLogs = activityLogRepository.findByProjectId(projectId, PageRequest.of(page, size));
-        return buildActivityLogResponse(activityLogs);
-    }
-
-    @Override
-    public CommonPageInfo<ActivityLogResponse> getActivityLogsByUser(String userId, Integer page, Integer size) {
-        Page<ActivityLog> activityLogs = activityLogRepository.findByUserId(userId, PageRequest.of(page, size));
-        return buildActivityLogResponse(activityLogs);
-    }
-
-    @Override
     public CommonPageInfo<ActivityLogResponse> getActivityLogs(Integer page, Integer size) {
         Page<ActivityLog> activityLogs = null;
         if (SecurityUtil.isAdmin()) {

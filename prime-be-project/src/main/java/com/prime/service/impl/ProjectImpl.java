@@ -90,14 +90,6 @@ public class ProjectImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponse> getAllProject() {
-        List<Project> projects = projectRepository.findAll();
-        return projects.stream()
-                .map(MAPPER::projectToProjectResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public ProjectResponse getProjectById(UUID projectId) {
         projectValidator.validateDelete(projectId);
         Project project = projectRepository.findById(projectId).get();
@@ -213,21 +205,11 @@ public class ProjectImpl implements ProjectService {
             
             // Set raw counts
             switch (status) {
-                case BACK_LOG:
-                    statusBreakdown.setBacklogTasks(count);
-                    break;
-                case DOING:
-                    statusBreakdown.setDoingTasks(count);
-                    break;
-                case ON_HOLD:
-                    statusBreakdown.setOnHoldTasks(count);
-                    break;
-                case DONE:
-                    statusBreakdown.setDoneTasks(count);
-                    break;
-                case ARCHIVED:
-                    statusBreakdown.setArchivedTasks(count);
-                    break;
+                case BACK_LOG -> statusBreakdown.setBacklogTasks(count);
+                case DOING -> statusBreakdown.setDoingTasks(count);
+                case ON_HOLD -> statusBreakdown.setOnHoldTasks(count);
+                case DONE -> statusBreakdown.setDoneTasks(count);
+                case ARCHIVED -> statusBreakdown.setArchivedTasks(count);
             }
         }
         

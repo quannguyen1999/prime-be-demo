@@ -40,7 +40,6 @@ public class GatewayApplication {
 										.rewritePath("/user-service/(?<segment>.*)", "/${segment}")
 										.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
 										.retry(3)
-//								.setResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR, "Service unavailable")
 						)
 						.uri("lb://PRIME-USER-SERVICE"))
 
@@ -51,22 +50,9 @@ public class GatewayApplication {
 										.rewritePath("/project-service/(?<segment>.*)", "/${segment}")
 										.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
 										.retry(3)
-//								.setResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR, "Service unavailable")
 						)
 						.uri("lb://PRIME-USER-PROJECT"))
 				.build();
 	}
 
-//	@Bean
-//	public CorsConfigurationSource corsConfigurationSource() {
-//		CorsConfiguration configuration = new CorsConfiguration();
-//		configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-//		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//		configuration.setAllowedHeaders(List.of("*"));
-//		configuration.setAllowCredentials(Boolean.FALSE);
-//
-//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//		source.registerCorsConfiguration("/**", configuration);
-//		return source;
-//	}
 }
