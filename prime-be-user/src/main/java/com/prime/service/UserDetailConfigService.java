@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+/**
+ * Service for loading user details during authentication.
+ * Implements Spring Security's UserDetailsService to provide user information for authentication.
+ */
 @RequiredArgsConstructor
 @Service
 public class UserDetailConfigService implements UserDetailsService {

@@ -65,10 +65,14 @@ import static com.prime.constants.UserRole.ADMIN;
 import static com.prime.constants.UserRole.USER;
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Main security configuration class that sets up OAuth2 authorization server,
+ * JWT token handling, and resource server security.
+ */
 @Configuration
 public class SecurityConfig {
 
-    //  Allowed endpoints for public access (Swagger, OAuth2, Registration, etc.)
+    // Public endpoints that don't require authentication
     private static final List<String> ALLOW_REQUEST = Arrays.asList(
             "/v3/api-docs/**",  // OpenAPI docs
             "/swagger-ui/**",   // Swagger UI
@@ -77,18 +81,18 @@ public class SecurityConfig {
             "/oauth2/token",    // OAuth2 Token Generation
             "/registration",    // User Registration Endpoint
             "/authenticator",   // Custom Authentication
-            "/actuator/**" // Actuator
+            "/actuator/**"      // Actuator endpoints
     );
 
-    @Value("${custom-security.issuer}")  // OAuth2 Issuer URL (Defined in application.yml)
+    @Value("${custom-security.issuer}")
     private String issuer;
 
     @Autowired
     private UserRepository userRepository;
 
     /**
-     * Security Filter Chain for OAuth2 Authorization Server
-     * - Handles token generation, authentication, and authorization
+     * Configures OAuth2 Authorization Server endpoints and security.
+     * Handles token generation and custom password grant type.
      */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -123,6 +127,10 @@ public class SecurityConfig {
     public static final String JWT_ROLE_NAME = "authorities"; // Defines the JWT claim name for roles
 
 
+    /**
+     * Configures resource server security with JWT authentication.
+     * Defines access control rules for different endpoints.
+     */
     @Order(2)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
@@ -166,6 +174,9 @@ public class SecurityConfig {
         return new InMemoryOAuth2AuthorizationService();
     }
 
+    /**
+     * Provides JWT decoder for token verification.
+     */
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
@@ -178,6 +189,9 @@ public class SecurityConfig {
         return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
     }
 
+    /**
+     * Generates RSA key pair for JWT signing and verification.
+     */
     private static RSAKey generateRsa() {
         KeyPair keyPair = generateRsaKey();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
@@ -211,6 +225,9 @@ public class SecurityConfig {
                 jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
     }
 
+    /**
+     * Configures token settings including format and expiration.
+     */
     @Bean
     public TokenSettings tokenSettings() {
         return TokenSettings.builder()
@@ -229,11 +246,17 @@ public class SecurityConfig {
         return new SavedRequestAwareAuthenticationSuccessHandler();
     }
 
+    /**
+     * Provides password encoder for secure password hashing.
+     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Provides encryption service for sensitive data.
+     */
     @Bean
     BytesEncryptor bytesEncryptor(@Value("${jwt.secret.key}") String secret) {
         SecretKey secretKey = new SecretKeySpec(Base64.getDecoder().decode(secret.trim()), "AES");
@@ -241,6 +264,9 @@ public class SecurityConfig {
         return new AesBytesEncryptor(secretKey, ivGenerator, AesBytesEncryptor.CipherAlgorithm.GCM);
     }
 
+    /**
+     * Configures authorization server settings including endpoints.
+     */
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
@@ -254,6 +280,9 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Customizes JWT token generation to include user authorities.
+     */
     @Bean
     OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
         return context -> {
@@ -279,21 +308,6 @@ public class SecurityConfig {
             ;
         };
     }
-
-//    //Set CORS
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//
-//        // Allow all origins, methods, and headers. This is just an example.
-//        config.addAllowedOrigin("*");
-//        config.addAllowedMethod("*");
-//        config.addAllowedHeader("*");
-//        source.registerCorsConfiguration("/**", config);
-//        return new CorsFilter(source);
-//    }
-
 
     //Set timeout session
     @Bean

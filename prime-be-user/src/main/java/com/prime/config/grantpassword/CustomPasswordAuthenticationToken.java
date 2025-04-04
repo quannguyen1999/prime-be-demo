@@ -1,3 +1,4 @@
+
 package com.prime.config.grantpassword;
 
 import org.springframework.lang.Nullable;
@@ -10,6 +11,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Represents an authentication request using custom password grant type,
+ * containing username, password, and requested scopes.
+ */
 public class CustomPasswordAuthenticationToken extends OAuth2AuthorizationGrantAuthenticationToken {
 
 	private static final long serialVersionUID = 1L;

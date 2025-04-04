@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.HashSet;
 
+/**
+ * Custom implementation of UserDetails for user authentication.
+ * Provides user details and authorities for authentication purposes.
+ */
 public class CustomUserDetails implements UserDetails {
 
     private static final long serialVersionUID = 1L;

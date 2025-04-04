@@ -12,6 +12,10 @@ spring:
   jpa:
     show-sql: true
 
+  # WebSocket Configuration
+  websocket:
+    allowed-origins: ${WEBSOCKET_ALLOWED_ORIGINS:http://localhost:4200}  # Allowed WebSocket origins, can be overridden by environment variable
+
   # Flyway Database Migration
   flyway:
     url: jdbc:mysql://localhost:${spring.datasource.port}/  # Flyway migration base URL

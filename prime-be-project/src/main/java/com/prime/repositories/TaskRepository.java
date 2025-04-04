@@ -13,14 +13,55 @@ import java.util.UUID;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, UUID> {
-    // Find all tasks by projectId
+
+    /**
+     * Finds all tasks associated with a specific project.
+     * 
+     * This method retrieves a list of tasks that belong to the specified project.
+     * The tasks are returned in their natural order.
+     * 
+     * @param projectId The UUID of the project to find tasks for
+     * @return List of tasks associated with the project
+     */
     List<Task> findByProjectId(UUID projectId);
 
-    List<Task> findByProjectIdAndAssignedTo(UUID projectId, UUID assignedTo);
+    /**
+     * Finds all tasks assigned to a specific user.
+     * 
+     * This method retrieves a list of tasks that are assigned to the specified user.
+     * The tasks are returned in their natural order.
+     * 
+     * @param assigneeId The UUID of the user to find assigned tasks for
+     * @return List of tasks assigned to the user
+     */
+    List<Task> findByAssigneeId(UUID assigneeId);
 
-    @Query("SELECT p FROM Task p WHERE " +
-            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    /**
+     * Searches for tasks by name using a case-insensitive partial match.
+     * 
+     * This method performs a search for tasks where the name contains
+     * the specified keyword (case-insensitive). The results are paginated.
+     * 
+     * @param keyword The search term to match against task names
+     * @param pageRequest The pagination information (page number and size)
+     * @return Page of tasks matching the search criteria
+     */
+    @Query("SELECT t FROM Task t WHERE " +
+            "LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Task> searchTasks(@Param("keyword") String keyword, PageRequest pageRequest);
+
+    /**
+     * Finds all tasks with a specific status.
+     * 
+     * This method retrieves a list of tasks that have the specified status.
+     * The tasks are returned in their natural order.
+     * 
+     * @param status The status to filter tasks by
+     * @return List of tasks with the specified status
+     */
+    List<Task> findByStatus(String status);
+
+    List<Task> findByProjectIdAndAssignedTo(UUID projectId, UUID assignedTo);
 
     @Query("SELECT p FROM Task p WHERE " +
             "p.assignedTo = :assignIdUser")

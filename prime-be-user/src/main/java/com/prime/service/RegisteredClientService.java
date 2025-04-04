@@ -22,9 +22,14 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 import java.util.*;
 
+/**
+ * Manages OAuth2 client registration and configuration.
+ * Handles client authentication methods, grant types, and token settings.
+ */
 @Service
 public class RegisteredClientService implements RegisteredClientRepository {
 
+    // Token duration configurations
     @Value("${security.duration.token}")
     private Long timeToken;
 
@@ -53,6 +58,9 @@ public class RegisteredClientService implements RegisteredClientRepository {
         this.clientRepository.save(toEntity(registeredClient));
     }
 
+    /**
+     * Converts RegisteredClient to database entity for persistence.
+     */
     private Client toEntity(RegisteredClient registeredClient) {
         List<String> clientAuthenticationMethods = new ArrayList<>(registeredClient.getClientAuthenticationMethods().size());
         registeredClient.getClientAuthenticationMethods().forEach(clientAuthenticationMethod ->
@@ -93,6 +101,9 @@ public class RegisteredClientService implements RegisteredClientRepository {
         return this.clientRepository.findById(UUID.fromString(id)).map(this::toObject).orElse(null);
     }
 
+    /**
+     * Converts database entity to RegisteredClient for OAuth2 operations.
+     */
     private RegisteredClient toObject(Client client) {
         Set<String> clientAuthenticationMethods = StringUtils.commaDelimitedListToSet(
                 client.getClientAuthenticationMethods());
@@ -121,6 +132,9 @@ public class RegisteredClientService implements RegisteredClientRepository {
         return builder.build();
     }
 
+    /**
+     * Builds token settings with configured durations and security parameters.
+     */
     private Map<String, Object> buildToken() {
         Map<String, Object> tokenSettingsMap = new HashMap<>();
         Duration durationAuthorization = Duration.ofDays(timeAuthorization);
@@ -135,6 +149,9 @@ public class RegisteredClientService implements RegisteredClientRepository {
         return tokenSettingsMap;
     }
 
+    /**
+     * Resolves client authentication method from string representation.
+     */
     private static ClientAuthenticationMethod resolveClientAuthenticationMethod(String clientAuthenticationMethod) {
         if (ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue().equals(clientAuthenticationMethod)) {
             return ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
@@ -146,6 +163,9 @@ public class RegisteredClientService implements RegisteredClientRepository {
         return new ClientAuthenticationMethod(clientAuthenticationMethod);      // Custom client authentication method
     }
 
+    /**
+     * Resolves authorization grant type from string representation.
+     */
     private static AuthorizationGrantType resolveAuthorizationGrantType(String authorizationGrantType) {
         if (AuthorizationGrantType.AUTHORIZATION_CODE.getValue().equals(authorizationGrantType)) {
             return AuthorizationGrantType.AUTHORIZATION_CODE;

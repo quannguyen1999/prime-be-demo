@@ -1,6 +1,7 @@
 package com.prime.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -23,6 +24,25 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.util.Map;
 
+/**
+ * Configuration class for WebSocket and STOMP messaging in the application.
+ * 
+ * This class configures:
+ * - WebSocket endpoints and message brokers
+ * - STOMP protocol support
+ * - Message size limits and timeouts
+ * - Authentication and authorization for WebSocket connections
+ * - CORS and origin policies
+ * 
+ * The configuration enables real-time communication between clients and the server
+ * using WebSocket and STOMP protocols, with proper security measures in place.
+ * 
+ * @see org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
+ * @see org.springframework.messaging.simp.config.MessageBrokerRegistry
+ * 
+ * @author Prime Team
+ * @version 1.0
+ */
 @Slf4j
 @Configuration
 @EnableWebSocketMessageBroker
@@ -30,10 +50,23 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtDecoder jwtDecoder;
 
+    @Value("${spring.websocket.allowed-origins}")
+    private String allowedOrigins;
+
     public WebSocketConfig(JwtDecoder jwtDecoder) {
         this.jwtDecoder = jwtDecoder;
     }
 
+    /**
+     * Configures the message broker for STOMP messaging.
+     * 
+     * This method:
+     * - Enables a simple in-memory message broker
+     * - Sets up destination prefixes for message routing
+     * - Configures application destination prefixes
+     * 
+     * @param config The MessageBrokerRegistry to configure
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         log.info("Configuring message broker");
@@ -41,11 +74,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
+    /**
+     * Registers STOMP endpoints and configures handshake handling.
+     * 
+     * This method:
+     * - Registers the WebSocket endpoint
+     * - Configures allowed origins and patterns
+     * - Sets up handshake interceptors
+     * - Configures custom handshake handler
+     * 
+     * @param registry The StompEndpointRegistry to configure
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        log.info("Registering STOMP endpoints");
+        log.info("Registering STOMP endpoints with allowed origins: {}", allowedOrigins);
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:4200")
+                .setAllowedOrigins(allowedOrigins)
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new HandshakeInterceptor() {
                     @Override
@@ -74,6 +118,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 });
     }
 
+    /**
+     * Configures WebSocket transport settings.
+     * 
+     * This method:
+     * - Sets message size limits
+     * - Configures send buffer size
+     * - Sets send time limits
+     * 
+     * @param registration The WebSocketTransportRegistration to configure
+     */
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         log.info("Configuring WebSocket transport");
@@ -82,6 +136,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setSendTimeLimit(20000); // 20 seconds
     }
 
+    /**
+     * Configures the client inbound channel with authentication.
+     * 
+     * This method:
+     * - Adds authentication interceptor
+     * - Processes JWT tokens
+     * - Sets up security context
+     * 
+     * @param registration The ChannelRegistration to configure
+     */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         log.info("Configuring client inbound channel");

@@ -4,7 +4,7 @@ services:
       - "prime-network"
     # Active profile
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: prod
 
   # Common Config server
   microservice-config-server-config:
@@ -33,5 +33,5 @@ services:
     extends:
       service: network-deploy-service
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: prod
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://prime-be-eureka:8761/eureka/

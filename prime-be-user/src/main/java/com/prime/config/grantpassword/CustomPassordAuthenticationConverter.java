@@ -1,3 +1,4 @@
+
 package com.prime.config.grantpassword;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,10 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+/**
+ * Converts HTTP request parameters into a CustomPasswordAuthenticationToken,
+ * validating required parameters for custom password grant type.
+ */
 public class CustomPassordAuthenticationConverter implements AuthenticationConverter {
     private static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();

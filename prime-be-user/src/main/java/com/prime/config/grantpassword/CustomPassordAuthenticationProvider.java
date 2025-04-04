@@ -1,8 +1,11 @@
+
 package com.prime.config.grantpassword;
 
 import com.prime.entities.User;
 import com.prime.models.request.CustomPasswordUser;
 import com.prime.repositories.UserRepository;
+
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -29,9 +32,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Handles custom password grant type authentication by validating user credentials
+ * and generating OAuth2 access and refresh tokens.
+ */
 public class CustomPassordAuthenticationProvider implements AuthenticationProvider {
 
-    private static final String ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
     private final OAuth2AuthorizationService authorizationService;
 
     private final UserRepository userRepository;
@@ -131,7 +137,7 @@ public class CustomPassordAuthenticationProvider implements AuthenticationProvid
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
         if (generatedAccessToken == null) {
             OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                    "The token generator failed to generate the access token.", ERROR_URI);
+                    "The token generator failed to generate the access token.", Strings.EMPTY);
             throw new OAuth2AuthenticationException(error);
         }
 
@@ -154,7 +160,7 @@ public class CustomPassordAuthenticationProvider implements AuthenticationProvid
             OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
             if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-                        "The token generator failed to generate the refresh token.", ERROR_URI);
+                        "The token generator failed to generate the refresh token.", Strings.EMPTY);
                 throw new OAuth2AuthenticationException(error);
             }
             refreshToken = (OAuth2RefreshToken) generatedRefreshToken;

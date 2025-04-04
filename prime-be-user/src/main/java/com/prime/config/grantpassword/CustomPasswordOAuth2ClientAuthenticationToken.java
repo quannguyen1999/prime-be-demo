@@ -1,3 +1,4 @@
+
 package com.prime.config.grantpassword;
 
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -6,6 +7,10 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 
 import java.util.Map;
 
+/**
+ * Extends OAuth2ClientAuthenticationToken to support custom password grant type
+ * client authentication.
+ */
 public class CustomPasswordOAuth2ClientAuthenticationToken extends OAuth2ClientAuthenticationToken {
 
     public CustomPasswordOAuth2ClientAuthenticationToken(String clientId,
