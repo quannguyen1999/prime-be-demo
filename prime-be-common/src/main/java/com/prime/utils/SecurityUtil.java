@@ -1,6 +1,7 @@
 package com.prime.utils;
 
 import com.prime.constants.MessageErrors;
+import com.prime.constants.RolePrefix;
 import com.prime.constants.UserRole;
 import com.prime.exceptions.UnauthorizedRequestException;
 import lombok.experimental.UtilityClass;
@@ -17,36 +18,54 @@ import java.util.UUID;
 public class SecurityUtil {
 
     public Object getPrincipal() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getPrincipal() : null;
     }
 
     public Object getDetails() {
-        return SecurityContextHolder.getContext().getAuthentication().getDetails();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getDetails() : null;
     }
 
     public Object getCredentials() {
-        return SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getCredentials() : null;
     }
 
     public UUID getIDUser() {
-        return UUID.fromString(Objects.requireNonNull(getValueByKey("id")));
+        String id = getValueByKey("id");
+        if (id == null) {
+            throw new UnauthorizedRequestException(MessageErrors.UNAUTHORIZED);
+        }
+        return UUID.fromString(id);
     }
 
     public String getUserName() {
-        return getValueByKey("user");
+        String username = getValueByKey("user");
+        if (username == null) {
+            throw new UnauthorizedRequestException(MessageErrors.UNAUTHORIZED);
+        }
+        return username;
     }
 
     public Boolean isAdmin() {
-        return getAuthorities().parallelStream().anyMatch(t -> UserRole.ADMIN.toString().equalsIgnoreCase(t));
+        List<String> authorities = getAuthorities();
+        if (authorities == null || authorities.isEmpty()) {
+            return false;
+        }
+        return authorities.parallelStream()
+                .anyMatch(t -> RolePrefix.ADMIN.equalsIgnoreCase(t) || 
+                             (RolePrefix.ROLE_PREFIX + UserRole.ADMIN.toString()).equalsIgnoreCase(t));
     }
 
     public List<String> getAuthorities() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new UnauthorizedRequestException(MessageErrors.UNAUTHORIZED);
+        }
 
         if (authentication instanceof JwtAuthenticationToken jwtAuthToken) {
             Object value = jwtAuthToken.getTokenAttributes().get("authorities");
-
-            // Ensure value is not null and is an instance of List
             if (value instanceof List<?> list) {
                 return list.stream().map(Object::toString).toList();
             }
@@ -57,6 +76,9 @@ public class SecurityUtil {
 
     private String getValueByKey(String key) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new UnauthorizedRequestException(MessageErrors.UNAUTHORIZED);
+        }
 
         if (authentication instanceof JwtAuthenticationToken jwtAuthToken) {
             Object value = jwtAuthToken.getTokenAttributes().get(key);
@@ -65,6 +87,4 @@ public class SecurityUtil {
 
         throw new UnauthorizedRequestException(MessageErrors.UNAUTHORIZED);
     }
-
-
 }

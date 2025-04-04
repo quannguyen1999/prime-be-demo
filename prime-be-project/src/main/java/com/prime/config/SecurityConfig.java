@@ -37,7 +37,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",  // OpenAPI docs
             "/swagger-ui/**",   // Swagger UI
             "/swagger-ui.html", // Swagger UI main page
-            "/webjars/**"       // WebJars for Swagger dependencies
+            "/webjars/**",       // WebJars for Swagger dependencies
+            "/ws/**"            // WebSocket endpoints
     );
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
