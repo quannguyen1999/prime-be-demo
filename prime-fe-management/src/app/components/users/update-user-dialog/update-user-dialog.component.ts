@@ -19,13 +19,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         <div class="space-y-4">
           <!-- Username Field (Disabled) -->
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Username</mat-label>
             <input matInput formControlName="username" placeholder="Enter username" [disabled]="true">
           </mat-form-field>
 
           <!-- Email Field -->
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Email</mat-label>
             <input matInput formControlName="email" placeholder="Enter email" type="email">
             <mat-error *ngIf="userForm.get('email')?.invalid">
               {{getErrorMessage('email')}}
@@ -34,7 +32,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
           <!-- Role Field -->
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Role</mat-label>
             <mat-select formControlName="role">
               <mat-option *ngFor="let role of roles" [value]="role">
                 {{role}}

@@ -5,6 +5,7 @@ import com.prime.constants.ActivityType;
 import com.prime.constants.TaskStatus;
 import com.prime.entities.Project;
 import com.prime.feignClient.UserServiceClient;
+import com.prime.mappers.ProjectMapper;
 import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.ProjectRequest;
 import com.prime.models.response.ProjectOverallStatisticsResponse;
@@ -25,8 +26,6 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.prime.mappers.ProjectMapper.MAPPER;
-
 @AllArgsConstructor
 @Service
 public class ProjectImpl implements ProjectService {
@@ -35,15 +34,16 @@ public class ProjectImpl implements ProjectService {
     private final TaskRepository taskRepository;
     private final ProjectValidator projectValidator;
     private final UserServiceClient userServiceClient;
+    private final ProjectMapper projectMapper;
 
     @Override
     @Audited(activityType = ActivityType.PROJECT_CREATED, entityType = "PROJECT")
     public ProjectResponse createProject(ProjectRequest projectRequest) {
         projectValidator.validateCreate(projectRequest);
-        Project project = MAPPER.projectRequestToProject(projectRequest);
+        Project project = projectMapper.projectRequestToProject(projectRequest);
         project.setOwnerId(SecurityUtil.getIDUser());
         Project projectInsert = projectRepository.save(project);
-        return MAPPER.projectToProjectResponse(projectInsert);
+        return projectMapper.projectToProjectResponse(projectInsert);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ProjectImpl implements ProjectService {
                 .total(projects.getTotalElements())
                 .page(projects.getNumber())
                 .size(projects.getSize())
-                .data(projects.getContent().stream().map(MAPPER::projectToProjectResponse).collect(Collectors.toList()))
+                .data(projects.getContent().stream().map(projectMapper::projectToProjectResponse).collect(Collectors.toList()))
                 .build();
 
         Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(projects.getContent().stream().map(Project::getOwnerId).collect(Collectors.toList()));
@@ -86,14 +86,14 @@ public class ProjectImpl implements ProjectService {
             project.setDescription(projectRequest.getDescription());
         }
         project = projectRepository.save(project);
-        return MAPPER.projectToProjectResponse(project);
+        return projectMapper.projectToProjectResponse(project);
     }
 
     @Override
     public ProjectResponse getProjectById(UUID projectId) {
         projectValidator.validateDelete(projectId);
         Project project = projectRepository.findById(projectId).get();
-        return MAPPER.projectToProjectResponse(project);
+        return projectMapper.projectToProjectResponse(project);
     }
 
     @Override

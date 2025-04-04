@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.prime.mappers.TaskMapper.MAPPER;
-
 @AllArgsConstructor
 @Service
 public class TaskImpl implements TaskService {
@@ -47,12 +45,14 @@ public class TaskImpl implements TaskService {
 
     private final WebSocketService webSocketService;
 
+    private final TaskMapper taskMapper;
+
     @Override
     @Audited(activityType = ActivityType.TASK_CREATED, entityType = "TASK")
     public TaskResponse createTask(TaskRequest taskRequest) {
         //Validate Create task
         UserResponse userAssigned = taskValidator.validateCreate(taskRequest);
-        Task task = MAPPER.taskRequestToTask(taskRequest);
+        Task task = taskMapper.taskRequestToTask(taskRequest);
         task.setAssignedTo(userAssigned.getId());
         task.setStatus(TaskStatus.BACK_LOG);
 
@@ -60,7 +60,7 @@ public class TaskImpl implements TaskService {
         task.setProject(project);
 
         Task taskInsert = taskRepository.save(task);
-        TaskResponse taskResponse = MAPPER.taskToTaskResponse(taskInsert);
+        TaskResponse taskResponse = taskMapper.taskToTaskResponse(taskInsert);
         taskResponse.setUserName(taskRequest.getAssignedTo());
         webSocketService.broadcastTaskCreation(task.getProject().getId().toString(), taskResponse);
         return taskResponse;
@@ -74,7 +74,7 @@ public class TaskImpl implements TaskService {
         Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(tasks.stream().map(Task::getAssignedTo).collect(Collectors.toList()));
 
         List<TaskResponse> taskResponse = tasks.stream()
-                .map(TaskMapper.MAPPER::taskToTaskResponse).toList();
+                .map(taskMapper::taskToTaskResponse).toList();
 
         //Map Username
         taskResponse.parallelStream().forEach(taskResponse1 -> {
@@ -103,7 +103,7 @@ public class TaskImpl implements TaskService {
                 .total(tasks.getTotalElements())
                 .page(tasks.getNumber())
                 .size(tasks.getSize())
-                .data(tasks.getContent().stream().map(MAPPER::taskToTaskResponse).collect(Collectors.toList()))
+                .data(tasks.getContent().stream().map(taskMapper::taskToTaskResponse).collect(Collectors.toList()))
                 .build();
 
         Map<UUID, String> getListUserNames = userServiceClient.getUsernameUsers(tasks.getContent().stream().map(Task::getAssignedTo).collect(Collectors.toList()));
@@ -147,7 +147,7 @@ public class TaskImpl implements TaskService {
             task.setAssignedTo(userResponse.getId());
         }
         task = taskRepository.save(task);
-        TaskResponse response = TaskMapper.MAPPER.taskToTaskResponse(task);
+        TaskResponse response = taskMapper.taskToTaskResponse(task);
         webSocketService.broadcastTaskUpdate(task.getProject().getId().toString(), response);
         return response;
     }
@@ -159,7 +159,7 @@ public class TaskImpl implements TaskService {
                 .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
         task.setStatus(status);
         task = taskRepository.save(task);
-        TaskResponse response = TaskMapper.MAPPER.taskToTaskResponse(task);
+        TaskResponse response = taskMapper.taskToTaskResponse(task);
         webSocketService.broadcastTaskUpdate(task.getProject().getId().toString(), response);
         return response;
     }
@@ -171,7 +171,7 @@ public class TaskImpl implements TaskService {
                 .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
         task.setAssignedTo(userId);
         task = taskRepository.save(task);
-        TaskResponse response = TaskMapper.MAPPER.taskToTaskResponse(task);
+        TaskResponse response = taskMapper.taskToTaskResponse(task);
         webSocketService.broadcastTaskUpdate(task.getProject().getId().toString(), response);
         return response;
     }

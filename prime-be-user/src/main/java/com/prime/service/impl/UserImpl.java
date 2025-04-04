@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.prime.mappers.UserMapper.MAPPER;
+import com.prime.mappers.UserMapper;
 
 @AllArgsConstructor
 @Service
@@ -31,10 +31,9 @@ public class UserImpl implements UserService {
     private static final String DEFAULT_PASS = "123456";
 
     private final UserRepository userRepository;
-
     private final UserValidator userValidator;
-
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
@@ -46,8 +45,8 @@ public class UserImpl implements UserService {
             userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }
         userRequest.setRole(UserRole.USER);
-        User user = userRepository.save(MAPPER.userRequestToUser(userRequest));
-        return MAPPER.userToUserResponse(user);
+        User user = userRepository.save(userMapper.userRequestToUser(userRequest));
+        return userMapper.userToUserResponse(user);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class UserImpl implements UserService {
                 .total(user.getTotalElements())
                 .page(user.getNumber())
                 .size(user.getSize())
-                .data(user.getContent().stream().map(MAPPER::userToUserResponse).collect(Collectors.toList()))
+                .data(user.getContent().stream().map(userMapper::userToUserResponse).collect(Collectors.toList()))
                 .build();
     }
 
@@ -78,7 +77,7 @@ public class UserImpl implements UserService {
         }
 
         user = userRepository.save(user);
-        return MAPPER.userToUserResponse(user);
+        return userMapper.userToUserResponse(user);
     }
 
     @Override
@@ -94,6 +93,6 @@ public class UserImpl implements UserService {
     @Override
     public UserResponse findUserByUsername(String username) {
         User user = userRepository.findUserByUsername(username);
-        return ObjectUtils.isEmpty(user) ? null : MAPPER.userToUserResponse(user);
+        return ObjectUtils.isEmpty(user) ? null : userMapper.userToUserResponse(user);
     }
 }
