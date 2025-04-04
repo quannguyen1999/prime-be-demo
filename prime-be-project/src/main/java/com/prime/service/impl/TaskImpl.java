@@ -2,6 +2,7 @@ package com.prime.service.impl;
 
 import com.prime.annotations.Audited;
 import com.prime.constants.ActivityType;
+import com.prime.constants.EntityType;
 import com.prime.constants.MessageErrors;
 import com.prime.constants.TaskStatus;
 import com.prime.entities.Project;
@@ -48,7 +49,7 @@ public class TaskImpl implements TaskService {
     private final TaskMapper taskMapper;
 
     @Override
-    @Audited(activityType = ActivityType.TASK_CREATED, entityType = "TASK")
+    @Audited(activityType = ActivityType.TASK_CREATED, entityType = EntityType.TASK)
     public TaskResponse createTask(TaskRequest taskRequest) {
         //Validate Create task
         UserResponse userAssigned = taskValidator.validateCreate(taskRequest);
@@ -96,8 +97,7 @@ public class TaskImpl implements TaskService {
             tasks = StringUtils.hasLength(nameTask) ? taskRepository.searchTasks(nameTask, PageRequest.of(page, size)) :
                     taskRepository.findAll(PageRequest.of(page, size));
         } else {
-            tasks = StringUtils.hasLength(nameTask) ? taskRepository.searchTasksByAssignIdUser(SecurityUtil.getIDUser(), PageRequest.of(page, size)) :
-                    taskRepository.searchTaskByKeyWordAndAssignIdUser(nameTask, SecurityUtil.getIDUser(), PageRequest.of(page, size));
+            tasks = taskRepository.searchTaskByKeyWordAndAssignIdUser(nameTask, SecurityUtil.getIDUser(), PageRequest.of(page, size));
         }
         CommonPageInfo<TaskResponse> taskResponse = CommonPageInfo.<TaskResponse>builder()
                 .total(tasks.getTotalElements())
@@ -116,7 +116,7 @@ public class TaskImpl implements TaskService {
     }
 
     @Override
-    @Audited(activityType = ActivityType.TASK_DELETED, entityType = "TASK")
+    @Audited(activityType = ActivityType.TASK_DELETED, entityType = EntityType.TASK)
     public void deleteTask(UUID taskId) {
         //Validate the delete task
         taskValidator.validateDeleteTask(taskId);
@@ -128,7 +128,7 @@ public class TaskImpl implements TaskService {
     }
 
     @Override
-    @Audited(activityType = ActivityType.TASK_UPDATED, entityType = "TASK")
+    @Audited(activityType = ActivityType.TASK_UPDATED, entityType = EntityType.TASK)
     public TaskResponse updateTask(TaskRequest taskRequest, UUID taskId) {
         //Validate the delete task
         UserResponse userResponse = taskValidator.validateUpdate(taskRequest, taskId);
@@ -153,7 +153,7 @@ public class TaskImpl implements TaskService {
     }
 
     @Override
-    @Audited(activityType = ActivityType.TASK_STATUS_CHANGED, entityType = "TASK")
+    @Audited(activityType = ActivityType.TASK_STATUS_CHANGED, entityType = EntityType.TASK)
     public TaskResponse updateTaskStatus(UUID id, TaskStatus status) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
@@ -165,7 +165,7 @@ public class TaskImpl implements TaskService {
     }
 
     @Override
-    @Audited(activityType = ActivityType.TASK_ASSIGNED, entityType = "TASK")
+    @Audited(activityType = ActivityType.TASK_ASSIGNED, entityType = EntityType.TASK)
     public TaskResponse assignTask(UUID id, UUID userId) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));

@@ -20,13 +20,13 @@
         <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
       </button>
 
-    
-      <div [matMenuTriggerFor]="menuNotification" 
-           class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center cursor-pointer hover:bg-blue-600 transition-colors duration-200">
-        <span class="text-sm font-medium text-white">{{userName[0]}}</span>
-      </div>
+      <!-- User Avatar Button -->
+      <button [matMenuTriggerFor]="menuNotification" 
+              class="w-8 h-8 rounded-full bg-[#4355B9] flex items-center justify-center cursor-pointer hover:bg-[#3a489e] transition-colors duration-200">
+        <span class="text-sm font-medium text-white uppercase">{{userName[0]}}</span>
+      </button>
 
-      <!-- Quesion -->
+      <!-- Help Menu -->
       <mat-menu #helpMenu="matMenu">
         <div class="px-4 py-2">
           <div class="text-sm">
@@ -37,43 +37,35 @@
         </div>
       </mat-menu>
 
-        <!-- Notification Menu -->
-        <mat-menu #notificationMenu="matMenu" class="w-80">
-          <div class="px-4 py-2">
-            <div class="font-medium text-gray-800">NOTIFICATIONS</div>
-            <div class="mt-2" *ngIf="notifications?.length; else noNotifications">
-              <!-- Notification items would go here -->
-            </div>
-            <ng-template #noNotifications>
-              <div class="text-center py-4 text-gray-500">
-                <mat-icon class="text-gray-400">notifications_off</mat-icon>
-                <p class="mt-2">No notifications at this time</p>
-              </div>
-            </ng-template>
-          </div>
-        </mat-menu>
-
-      <!-- Menu Profile -->
-      <mat-menu #menuNotification="matMenu">
-        <!-- Account Section -->
+      <!-- Notification Menu -->
+      <mat-menu #notificationMenu="matMenu" class="w-80">
         <div class="px-4 py-2">
-          <div class="font-medium text-gray-800">ACCOUNT</div>
-          <div class="flex items-center space-x-2 mt-2">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center">
-              <span class="text-sm text-white">{{userName[0]}}</span>
-            </div>
-            <div class="text-sm">
-              <div class="font-medium text-gray-800">{{userName}}</div>
-              <div class="text-gray-500">{{userEmail}}</div>
-            </div>
+          <div class="font-medium text-gray-800">NOTIFICATIONS</div>
+          <div class="mt-2" *ngIf="notifications?.length; else noNotifications">
+            <!-- Notification items would go here -->
           </div>
+          <ng-template #noNotifications>
+            <div class="text-center py-4 text-gray-500">
+              <mat-icon class="text-gray-400">notifications_off</mat-icon>
+              <p class="mt-2">No notifications at this time</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-menu>
+
+      <!-- User Profile Menu -->
+      <mat-menu #menuNotification="matMenu" class="min-w-[200px]">
+        <!-- Account Section -->
+        <div class="px-4 py-3">
+          <div class="font-medium text-gray-800 mb-2">ACCOUNT</div>
+          <div class="text-gray-700">{{userName}}</div>
         </div>
 
         <mat-divider></mat-divider>
 
         <!-- Settings Section -->
-        <div class="px-4 py-2">
-          <div class="font-medium text-gray-800">SETTINGS</div>
+        <div class="px-4 py-2 text-gray-800 font-medium">
+          SETTINGS
         </div>
         <button mat-menu-item (click)="openProfileDialog()">
           <span>Profile</span>

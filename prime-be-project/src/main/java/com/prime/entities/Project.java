@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,5 +33,7 @@ public class Project extends CommonBaseEntities{
     @JdbcTypeCode(SqlTypes.CHAR)
     private UUID ownerId;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
 
 }

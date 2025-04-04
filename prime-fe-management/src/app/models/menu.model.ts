@@ -4,4 +4,5 @@ export interface Menu {
     url: string;
     icon: string;
     isSelected: boolean;
+    roles: string[];
 }

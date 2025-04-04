@@ -44,34 +44,39 @@ export const listMenus: Menu[] = [
     name: 'Dashboard',
     url: '/home',
     icon: 'dashboard',
-    isSelected: false
+    isSelected: false,
+    roles: ['ADMIN']
   },
   {
     id: 2,
     name: 'Projects',
     url: '/projects',
     icon: 'folder',
-    isSelected: false
+    isSelected: false,
+    roles: ['ADMIN', 'USER']
   },
   {
     id: 3,
     name: 'Tasks',
     url: '/tasks',
     icon: 'task',
-    isSelected: false
+    isSelected: false,
+    roles: ['ADMIN', 'USER']
   },
   {
     id: 4,
     name: 'Team',
     url: '/team',
     icon: 'group',
-    isSelected: false
+    isSelected: false,
+    roles: ['ADMIN']
   },
   {
     id: 5,
     name: 'Logout',
     url: '/logout',
     icon: 'logout',
-    isSelected: false
+    isSelected: false,
+    roles: ['ADMIN', 'USER']
   }
 ];

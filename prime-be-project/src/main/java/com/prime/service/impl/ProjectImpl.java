@@ -2,6 +2,7 @@ package com.prime.service.impl;
 
 import com.prime.annotations.Audited;
 import com.prime.constants.ActivityType;
+import com.prime.constants.EntityType;
 import com.prime.constants.TaskStatus;
 import com.prime.entities.Project;
 import com.prime.feignClient.UserServiceClient;
@@ -37,7 +38,7 @@ public class ProjectImpl implements ProjectService {
     private final ProjectMapper projectMapper;
 
     @Override
-    @Audited(activityType = ActivityType.PROJECT_CREATED, entityType = "PROJECT")
+    @Audited(activityType = ActivityType.PROJECT_CREATED, entityType = EntityType.PROJECT)
     public ProjectResponse createProject(ProjectRequest projectRequest) {
         projectValidator.validateCreate(projectRequest);
         Project project = projectMapper.projectRequestToProject(projectRequest);
@@ -49,8 +50,21 @@ public class ProjectImpl implements ProjectService {
     @Override
     public CommonPageInfo<ProjectResponse> listProject(Integer page, Integer size, String name) {
         projectValidator.validateGetList(page, size);
-        Page<Project> projects = StringUtils.hasLength(name) ? projectRepository.searchProjects(name, PageRequest.of(page, size)) :
+        Page<Project> projects;
+        
+        if (SecurityUtil.isAdmin()) {
+            // Admin can see all projects
+            projects = StringUtils.hasLength(name) ? 
+                projectRepository.searchProjects(name, PageRequest.of(page, size)) :
                 projectRepository.findAll(PageRequest.of(page, size));
+        } else {
+            // Regular users only see projects where they have tasks
+            UUID userId = SecurityUtil.getIDUser();
+            projects = StringUtils.hasLength(name) ? 
+                projectRepository.findProjectsByUserTasksAndName(userId, name, PageRequest.of(page, size)) :
+                projectRepository.findProjectsByUserTasks(userId, PageRequest.of(page, size));
+        }
+
         CommonPageInfo<ProjectResponse> projectResponses = CommonPageInfo.<ProjectResponse>builder()
                 .total(projects.getTotalElements())
                 .page(projects.getNumber())
@@ -68,14 +82,14 @@ public class ProjectImpl implements ProjectService {
     }
 
     @Override
-    @Audited(activityType = ActivityType.PROJECT_DELETED, entityType = "PROJECT")
+    @Audited(activityType = ActivityType.PROJECT_DELETED, entityType = EntityType.PROJECT)
     public void deleteProject(UUID projectId) {
         projectValidator.validateDelete(projectId);
         projectRepository.deleteById(projectId);
     }
 
     @Override
-    @Audited(activityType = ActivityType.PROJECT_UPDATED, entityType = "PROJECT")
+    @Audited(activityType = ActivityType.PROJECT_UPDATED, entityType = EntityType.PROJECT)
     public ProjectResponse updateProject(ProjectRequest projectRequest, UUID projectId) {
         projectValidator.validateUpdate(projectRequest, projectId);
         Project project = projectRepository.findById(projectId).get();

@@ -31,10 +31,10 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
      * This method retrieves a list of tasks that are assigned to the specified user.
      * The tasks are returned in their natural order.
      * 
-     * @param assigneeId The UUID of the user to find assigned tasks for
+     * @param assignedTo The UUID of the user to find assigned tasks for
      * @return List of tasks assigned to the user
      */
-    List<Task> findByAssigneeId(UUID assigneeId);
+    List<Task> findByAssignedTo(UUID assignedTo);
 
     /**
      * Searches for tasks by name using a case-insensitive partial match.
@@ -47,7 +47,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
      * @return Page of tasks matching the search criteria
      */
     @Query("SELECT t FROM Task t WHERE " +
-            "LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+            "LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Task> searchTasks(@Param("keyword") String keyword, PageRequest pageRequest);
 
     /**
@@ -68,7 +68,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Page<Task> searchTasksByAssignIdUser(@Param("assignIdUser") UUID assignIdUser, PageRequest pageRequest);
 
     @Query("SELECT p FROM Task p WHERE " +
-            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) and p.assignedTo = :assignIdUser")
+            "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND p.assignedTo = :assignIdUser")
     Page<Task> searchTaskByKeyWordAndAssignIdUser(@Param("keyword") String keyword, @Param("assignIdUser") UUID assignIdUser, PageRequest pageRequest);
 
     @Query("SELECT t.status as status, COUNT(t) as count FROM Task t GROUP BY t.status")

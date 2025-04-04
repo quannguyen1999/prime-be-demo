@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { API_CONFIG } from '../constants/constant-value-model';
 import { environment } from '../../environments/environment';
+import { UserRoleService } from './user-role.service';
 
 interface LoginResponse {
   access_token: string;
@@ -27,11 +28,11 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private userRoleService: UserRoleService
   ) {}
 
   register(username: string, email: string, password: string): Observable<RegisterResponse> {  
-  // return this.http.post<LoginResponse>(API_CONFIG.auth.tokenUrl, null, { params }).pipe(
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, {
       username,
       email,
@@ -83,6 +84,7 @@ export class AuthService {
       tap(response => {
         localStorage.setItem('access_token', response.access_token);
         localStorage.setItem('refresh_token', response.refresh_token);
+        this.userRoleService.reloadRoles();
         this.snackBar.open('Login successful', 'Close', { duration: 3000 });
         this.router.navigate(['/home']);
       }),

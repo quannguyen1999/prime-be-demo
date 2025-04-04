@@ -16,6 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { UserRoleService } from '../../services/user-role.service';
+import { jwtDecode } from 'jwt-decode';
 
 interface ProjectCard {
   id: string;
@@ -145,16 +147,35 @@ export class DashboardComponent implements OnInit {
   activityLogsPageSize: number = 5;
   activityLogsPageIndex: number = 0;
 
+  isAdmin = false;
+  username: string = '';
+
   constructor(
     private router: Router,
     private projectService: ProjectService,
-    private snackBar: MatSnackBar
-  ) {}
+    private snackBar: MatSnackBar,
+    private userRoleService: UserRoleService
+  ) {
+    this.isAdmin = this.userRoleService.isAdmin();
+    // Get username from token
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      try {
+        const decoded = jwtDecode<any>(token);
+        this.username = decoded.user || 'User';
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        this.username = 'User';
+      }
+    }
+  }
 
   ngOnInit(): void {
-    this.loadStatistics();
-    this.loadOverallStatistics();
-    this.loadActivityLogs();
+    if (this.isAdmin) {
+      this.loadStatistics();
+      this.loadOverallStatistics();
+      this.loadActivityLogs();
+    }
   }
 
   loadStatistics(): void {

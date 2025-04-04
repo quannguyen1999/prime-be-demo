@@ -20,6 +20,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { UserRoleService } from '../../../services/user-role.service';
 
 @Component({
   selector: 'app-project-list',
@@ -48,6 +49,7 @@ export class ProjectListComponent implements OnInit {
   pageSize = 5;
   pageIndex = 0;
   protected readonly Math = Math;
+  isAdmin = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -56,8 +58,11 @@ export class ProjectListComponent implements OnInit {
     private router: Router,
     private sidebarService: SidebarService,
     private projectService: ProjectService,
-    private snackBar: MatSnackBar
-  ) {}
+    private snackBar: MatSnackBar,
+    private userRoleService: UserRoleService
+  ) {
+    this.isAdmin = this.userRoleService.isAdmin();
+  }
 
   ngOnInit(): void {
     this.loadProjects();

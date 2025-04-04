@@ -15,4 +15,10 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     @Query("SELECT p FROM Project p WHERE " +
             "LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Project> searchProjects(@Param("keyword") String keyword, PageRequest pageRequest);
+
+    @Query("SELECT DISTINCT p FROM Project p JOIN p.tasks t WHERE t.assignedTo = :userId")
+    Page<Project> findProjectsByUserTasks(@Param("userId") UUID userId, PageRequest pageRequest);
+
+    @Query("SELECT DISTINCT p FROM Project p JOIN p.tasks t WHERE t.assignedTo = :userId AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Page<Project> findProjectsByUserTasksAndName(@Param("userId") UUID userId, @Param("name") String name, PageRequest pageRequest);
 }

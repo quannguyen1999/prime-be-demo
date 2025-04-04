@@ -7,6 +7,7 @@ import { EventEmitter, Input, Output } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { UserRoleService } from '../../services/user-role.service';
 
 @Component({
   selector: 'app-side-bar',
@@ -49,15 +50,32 @@ export class SideBarComponent implements OnInit {
   @Input() currentTabMenu!: boolean;
   
   isExpandedSidebar = false;
-  listMenus: Array<Menu> = listMenus;
+  listMenus: Array<Menu> = [];
 
   constructor(
     private router: Router,
-    private sidebarService: SidebarService
+    private sidebarService: SidebarService,
+    private userRoleService: UserRoleService
   ) {}
 
   ngOnInit(): void {
-    // Initialize component
+    console.log('SideBarComponent initializing...');
+    // Ensure roles are loaded
+    this.userRoleService.reloadRoles();
+    this.filterMenusByRole();
+  }
+
+  private filterMenusByRole(): void {
+    console.log('Filtering menus by role...');
+    console.log('All available menus:', listMenus);
+    
+    this.listMenus = listMenus.filter(menu => {
+      const hasAccess = this.userRoleService.hasAnyRole(menu.roles);
+      console.log(`Menu "${menu.name}" (roles: ${menu.roles.join(', ')}): ${hasAccess ? 'visible' : 'hidden'}`);
+      return hasAccess;
+    });
+    
+    console.log('Filtered menus:', this.listMenus);
   }
 
   onHoverMenuEnter() {

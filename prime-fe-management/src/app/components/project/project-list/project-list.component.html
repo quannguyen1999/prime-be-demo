@@ -12,6 +12,7 @@
                class="pl-10 pr-4 py-2 w-[300px] border rounded-lg focus:outline-none focus:border-[#4355B9] text-sm">
       </div>
       <button mat-flat-button 
+              *ngIf="isAdmin"
               class="bg-[#4355B9] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm"
               (click)="openAddProjectDialog()">
         <mat-icon class="text-sm h-4 w-4">add</mat-icon>
