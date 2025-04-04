@@ -2,9 +2,11 @@ package com.prime.service.impl;
 
 import com.prime.annotations.Audited;
 import com.prime.constants.ActivityType;
+import com.prime.constants.MessageErrors;
 import com.prime.constants.TaskStatus;
 import com.prime.entities.Project;
 import com.prime.entities.Task;
+import com.prime.exceptions.BadRequestException;
 import com.prime.feignClient.UserServiceClient;
 import com.prime.mappers.TaskMapper;
 import com.prime.models.request.CommonPageInfo;
@@ -14,6 +16,7 @@ import com.prime.models.response.UserResponse;
 import com.prime.repositories.ProjectRepository;
 import com.prime.repositories.TaskRepository;
 import com.prime.service.TaskService;
+import com.prime.service.WebSocketService;
 import com.prime.utils.SecurityUtil;
 import com.prime.validators.TaskValidator;
 import lombok.AllArgsConstructor;
@@ -42,6 +45,8 @@ public class TaskImpl implements TaskService {
 
     private final UserServiceClient userServiceClient;
 
+    private final WebSocketService webSocketService;
+
     @Override
     @Audited(activityType = ActivityType.TASK_CREATED, entityType = "TASK")
     public TaskResponse createTask(TaskRequest taskRequest) {
@@ -57,6 +62,7 @@ public class TaskImpl implements TaskService {
         Task taskInsert = taskRepository.save(task);
         TaskResponse taskResponse = MAPPER.taskToTaskResponse(taskInsert);
         taskResponse.setUserName(taskRequest.getAssignedTo());
+        webSocketService.broadcastTaskCreation(task.getProject().getId().toString(), taskResponse);
         return taskResponse;
     }
 
@@ -114,7 +120,11 @@ public class TaskImpl implements TaskService {
     public void deleteTask(UUID taskId) {
         //Validate the delete task
         taskValidator.validateDeleteTask(taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
+        String projectId = task.getProject().getId().toString();
         taskRepository.deleteById(taskId);
+        webSocketService.broadcastTaskDeletion(projectId, taskId.toString());
     }
 
     @Override
@@ -122,7 +132,8 @@ public class TaskImpl implements TaskService {
     public TaskResponse updateTask(TaskRequest taskRequest, UUID taskId) {
         //Validate the delete task
         UserResponse userResponse = taskValidator.validateUpdate(taskRequest, taskId);
-        Task task = taskRepository.findById(taskId).get();
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
         if (StringUtils.hasLength(taskRequest.getTitle())) {
             task.setTitle(taskRequest.getTitle());
         }
@@ -132,10 +143,36 @@ public class TaskImpl implements TaskService {
         if (!ObjectUtils.isEmpty(taskRequest.getStatus())) {
             task.setStatus(taskRequest.getStatus());
         }
-        if (SecurityUtil.isAdmin()) {
+        if (SecurityUtil.isAdmin() && !ObjectUtils.isEmpty(userResponse)) {
             task.setAssignedTo(userResponse.getId());
         }
         task = taskRepository.save(task);
-        return TaskMapper.MAPPER.taskToTaskResponse(task);
+        TaskResponse response = TaskMapper.MAPPER.taskToTaskResponse(task);
+        webSocketService.broadcastTaskUpdate(task.getProject().getId().toString(), response);
+        return response;
+    }
+
+    @Override
+    @Audited(activityType = ActivityType.TASK_STATUS_CHANGED, entityType = "TASK")
+    public TaskResponse updateTaskStatus(UUID id, TaskStatus status) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
+        task.setStatus(status);
+        task = taskRepository.save(task);
+        TaskResponse response = TaskMapper.MAPPER.taskToTaskResponse(task);
+        webSocketService.broadcastTaskUpdate(task.getProject().getId().toString(), response);
+        return response;
+    }
+
+    @Override
+    @Audited(activityType = ActivityType.TASK_ASSIGNED, entityType = "TASK")
+    public TaskResponse assignTask(UUID id, UUID userId) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(MessageErrors.TASK_INVALID));
+        task.setAssignedTo(userId);
+        task = taskRepository.save(task);
+        TaskResponse response = TaskMapper.MAPPER.taskToTaskResponse(task);
+        webSocketService.broadcastTaskUpdate(task.getProject().getId().toString(), response);
+        return response;
     }
 }

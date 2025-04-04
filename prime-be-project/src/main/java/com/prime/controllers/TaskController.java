@@ -46,11 +46,10 @@ public class TaskController {
      * @return ResponseEntity with a list of tasks and HTTP 200 status.
      */
     @GetMapping(value = GET_TASK_BY_PROJECT)
-    public ResponseEntity<List<TaskResponse>> getAllTaskByProject(UUID projectId, Boolean byMe) {
+    public ResponseEntity<List<TaskResponse>> getAllTaskByProject(@RequestParam UUID projectId, Boolean byMe) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(taskService.getAllTaskByProject(projectId, byMe));
     }
-
 
     @GetMapping(value = GET_TASK_ROOT)
     public ResponseEntity<CommonPageInfo<TaskResponse>> getTaskRoot(@RequestParam Integer page, @RequestParam Integer size, String nameTask) {
@@ -82,4 +81,5 @@ public class TaskController {
         taskService.deleteTask(taskId);
         return ResponseEntity.ok("Task deleted successfully.");
     }
+
 }

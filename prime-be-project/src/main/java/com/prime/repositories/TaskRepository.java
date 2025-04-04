@@ -42,11 +42,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
             "FROM Task t GROUP BY t.project.id")
     List<Object[]> getProjectCompletionStats();
 
-    @Query("SELECT p.id as projectId, p.name as projectName, t.status as status, COUNT(t) as count " +
-            "FROM Project p LEFT JOIN Task t ON p.id = t.project.id " +
-            "GROUP BY p.id, p.name, t.status")
-    List<Object[]> getProjectTaskStatusStats();
-
     @Query("SELECT t.status as status, COUNT(t) as count " +
            "FROM Task t " +
            "GROUP BY t.status")

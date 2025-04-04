@@ -12,19 +12,33 @@ package com.prime.constants;
  */
 public interface PathApi {
     // Project Management Endpoints
-    /** Base path for all project-related operations */
+    /**
+     * Base path for all project-related operations
+     */
     String PROJECT = "/projects";
-    /** Path for retrieving project by its ID */
+    /**
+     * Path for retrieving project by its ID
+     */
     String GET_PROJECT_BY_ID = "/id";
-    /** Path for retrieving project statistics */
+    /**
+     * Path for retrieving project statistics
+     */
     String GET_PROJECT_STATISTICS = "/statistics";
 
+    String GET_PROJECT_OVERALL = "/overall-statistics";
+
     // User Management Endpoints
-    /** Base path for all user-related operations */
+    /**
+     * Base path for all user-related operations
+     */
     String USER = "/users";
-    /** Path for retrieving a list of user names */
+    /**
+     * Path for retrieving a list of user names
+     */
     String LIST_USER_NAME = "/getListUserNames";
-    /** Path for finding a user by their name */
+    /**
+     * Path for finding a user by their name
+     */
     String FIND_USER_NAME = "/findUserByName";
 
     // Task Management Endpoints

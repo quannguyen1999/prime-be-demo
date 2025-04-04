@@ -155,4 +155,33 @@ export class TaskService {
       })
     );
   }
+
+  updateTaskStatus(taskId: string, status: string): Observable<Task> {
+    const params = new HttpParams().set('taskId', taskId);
+    const taskData: UpdateTaskDto = {
+      title: '',  // These fields are required by the interface but not used for status update
+      description: '',
+      assignedTo: '',
+      status: status
+    };
+
+    return this.http.put<Task>(`${environment.projectServiceUrl}/tasks`, taskData, {
+      headers: this.getHeaders(),
+      params
+    }).pipe(
+      catchError(error => {
+        if (error.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
+        if (error.error?.details?.includes('TASK_NOT_EXISTS')) {
+          return throwError(() => new Error('Task not found'));
+        }
+        if (error.error?.details?.includes('USER_INVALID')) {
+          return throwError(() => new Error('Invalid user'));
+        }
+        return throwError(() => error);
+      })
+    );
+  }
 } 

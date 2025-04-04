@@ -8,9 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, String> {
-    Page<ActivityLog> findByProjectId(String projectId, Pageable pageable);
 
     Page<ActivityLog> findByUserId(String userId, Pageable pageable);
-
 
 }

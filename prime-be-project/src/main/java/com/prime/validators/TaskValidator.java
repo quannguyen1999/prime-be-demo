@@ -38,7 +38,7 @@ public class TaskValidator extends CommonValidator {
 
     public void validateIdProject(UUID id) {
         checkEmpty().accept(id, PRODUCT_INVALID);
-        checkCondition().accept(ObjectUtils.isEmpty(projectRepository.findById(id).get()), PRODUCT_ID_NOT_FOUND);
+        checkCondition().accept(ObjectUtils.isEmpty(projectRepository.findById(id)), PRODUCT_ID_NOT_FOUND);
     }
     
     public UserResponse validateCheckUsername(String username) {

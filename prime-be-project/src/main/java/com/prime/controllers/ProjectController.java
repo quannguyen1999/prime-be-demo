@@ -3,9 +3,9 @@ package com.prime.controllers;
 import com.prime.constants.PathApi;
 import com.prime.models.request.CommonPageInfo;
 import com.prime.models.request.ProjectRequest;
+import com.prime.models.response.ProjectOverallStatisticsResponse;
 import com.prime.models.response.ProjectResponse;
 import com.prime.models.response.ProjectStatisticsResponse;
-import com.prime.models.response.ProjectOverallStatisticsResponse;
 import com.prime.service.ProjectService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -87,7 +87,7 @@ public class ProjectController {
                 .body(projectService.getProjectStatistics());
     }
 
-    @GetMapping(value = "/overall-statistics")
+    @GetMapping(value = PathApi.GET_PROJECT_OVERALL)
     public ResponseEntity<ProjectOverallStatisticsResponse> getProjectOverallStatistics() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(projectService.getProjectOverallStatistics());
