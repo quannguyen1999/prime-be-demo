@@ -1,42 +1,46 @@
-## 1. Run Locally
+## 1. Local Development Environment
 
-```Step 1: Create
-  Access folder deploy/docker-compose/dev
-```
+### Prerequisites
+- Docker and Docker Compose installed
+- Git repository cloned locally
 
-```Step 2: 
-  Run "docker-compose up --build"
-  then wait a least 5 minutes to docker completely run
-```
+### Steps to Run Locally
+1. Navigate to the development environment directory:
+   ```bash
+   cd deploy/docker-compose/dev
+   ```
 
-```Step 3: 
-  then open http://localhost:80
-```
+2. Start the containers:
+   ```bash
+   docker-compose up
+   ```
+   Note: Initial startup takes approximately 5 minutes for all services to be ready
 
-## 2. Run Prod
+3. Access the application:
+   ```bash
+   http://localhost:80
+   ```
 
-```Step 1: Create
-  Access folder prod/docker-compose/dev
-```
+## 2. Production Environment
 
-```Step 2: 
-  Run "docker-compose up"
-```
+### Steps to Deploy
+1. Navigate to the production environment directory:
+   ```bash
+   cd deploy/docker-compose/prod
+   ```
 
-```Step 3: 
-  then open http://localhost:4200
-```
+2. Start the production containers:
+   ```bash
+   docker-compose up
+   ```
 
-## 3. (Optinal) Link Access swagger ui
+3. Access the production application:
+   ```bash
+   http://localhost:4200
+   ```
 
-```bash Project Service
-http://localhost:8080/swagger-ui/index.html#/
-```
+## 3. API Documentation
 
-```bash User Service
-http://localhost:8070/swagger-ui/index.html#/
-```
+The following Swagger UI endpoints are available for API documentation:
 
-```bash Eureka
-http://localhost:8671
-```
+### Project Service
