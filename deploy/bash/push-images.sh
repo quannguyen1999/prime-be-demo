@@ -47,11 +47,20 @@ push_image() {
 # Main script
 echo -e "${BLUE}Starting Docker image push process...${NC}"
 
+# Ensure we're in the correct directory
+cd "$(dirname "$0")"
+
+# Execute install_mvn_images.sh first
+echo -e "${BLUE}Executing install_mvn_images.sh to build and install images...${NC}"
+./install_mvn_images.sh
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to build and install images. Aborting push process.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Successfully built and installed all images${NC}"
+
 # Check Docker Hub login
 check_docker_login
-
-# Ensure we're in the correct directory
-cd "$(dirname "$0")/../.."
 
 # Push each image
 echo -e "${BLUE}Pushing latest images...${NC}"
