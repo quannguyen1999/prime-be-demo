@@ -5,3 +5,5 @@ spring:
     active: dev # Change the active
   application:
     name: prime-gateway-project
+  main:
+    web-application-type: reactive

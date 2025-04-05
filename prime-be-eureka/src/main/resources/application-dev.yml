@@ -18,9 +18,18 @@ management:
 
 # Logging Configuration
 logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: INFO
+    com.prime: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
   pattern:
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
-    # Custom logging format including:
-    # - Log level (e.g., INFO, ERROR)
-    # - Application name
-    # - Distributed tracing IDs (trace_id, span_id) for better tracking
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB

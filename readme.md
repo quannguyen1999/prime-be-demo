@@ -21,6 +21,12 @@
    http://localhost:80
    ```
 
+4. Login:
+   ```bash
+   admin/Password
+   <another account>/Password
+   ```
+
 ## 2. Production Environment
 
 ### Steps to Deploy
@@ -37,6 +43,11 @@
 3. Access the production application:
    ```bash
    http://localhost:4200
+   ```
+4. Login:
+   ```bash
+   admin/Password
+   <another account>/Password
    ```
 
 ## 3. API Documentation

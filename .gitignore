@@ -33,3 +33,5 @@ build/
 .vscode/
 docker
 .mvn
+/deploy/docker-compose/dev/logs/
+/deploy/docker-compose/prod/logs/

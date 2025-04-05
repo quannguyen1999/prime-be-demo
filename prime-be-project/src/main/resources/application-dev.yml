@@ -15,6 +15,10 @@ spring:
   # WebSocket Configuration
   websocket:
     allowed-origins: http://localhost:4200  # Allowed WebSocket origins
+    message-size-limit: 128KB  # Maximum message size
+    send-timeout: 5000  # Send timeout in milliseconds
+    send-buffer-size-limit: 512KB  # Send buffer size limit
+    time-to-first-message: 20000  # Time to first message in milliseconds
 
   # Flyway Database Migration
   flyway:
@@ -56,3 +60,21 @@ eureka:
     registerWithEureka: true  # Registers this service with Eureka
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+
+# Logging Configuration
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: INFO
+    com.prime: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
