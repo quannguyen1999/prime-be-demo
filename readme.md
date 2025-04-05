@@ -12,7 +12,7 @@
 
 2. Start the containers:
    ```bash
-   docker-compose up
+   docker-compose up --build
    ```
    Note: Initial startup takes approximately 5 minutes for all services to be ready
 
